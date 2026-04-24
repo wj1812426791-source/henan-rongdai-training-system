@@ -25,15 +25,8 @@
     </style>
 </head>
 <body>
-<div class="sidebar">
-    <h4>👨‍🎓 学员端</h4>
-    <a href="/student/courses">📚 课程列表</a>
-    <a href="/student/ranking" class="active">🏆 荣誉榜</a>
-    <a href="/teacher/upload">📤 上传课程</a>
-    <a href="/teacher/manage">🛠️ 课程管理</a>
-    <a href="/" class="mt-5">🏠 返回首页</a>
-</div>
-
+<div class="sidebar"></div>
+<script>var currentUserRole = 'student';</script>
 <div class="main-content">
 
 
@@ -79,6 +72,7 @@
 </div>
 </div>
 
+<script th:src="@{/js/shared-sidebar.js}"></script>
 <script th:src="@{/js/ranking-logic.js}"></script>
 
 </body>

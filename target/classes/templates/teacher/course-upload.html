@@ -14,15 +14,8 @@
     </style>
 </head>
 <body>
-<div class="sidebar">
-    <h4>👨‍🏫 教师端</h4>
-    <a href="/teacher/upload" class="active">📤 上传课程</a>
-    <a href="/teacher/manage">🛠️ 课程管理</a>
-    <a href="/student/courses">📚 学员课程</a>
-    <a href="/student/ranking">🏆 荣誉榜</a>
-    <a href="/" class="mt-5">🏠 返回首页</a>
-</div>
-
+<div class="sidebar"></div>
+<script>var currentUserRole = 'teacher';</script>
 <div class="main-content">
 <div class="container py-5">
     <div class="card shadow-sm mx-auto" style="max-width: 600px;">
@@ -62,6 +55,7 @@
 </div>
 </div>
 
+<script th:src="@{/js/shared-sidebar.js}"></script>
 <script th:src="@{/js/upload-logic.js}"></script>
 </body>
 </html>
