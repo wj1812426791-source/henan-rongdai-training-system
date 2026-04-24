@@ -29,24 +29,33 @@
     </div>
 
     <div class="row row-cols-1 row-cols-md-3 g-4">
-        <div class="col" th:each="course : ${courses}">
-            <div class="card h-100 course-card">
-                <div class="video-thumb">
-                    <span style="font-size: 3rem;">▶️</span>
-                    <span class="badge bg-primary category-badge" th:text="${course.category}">分类</span>
-                </div>
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${course.courseName}">课程名称</h5>
-                    <p class="text-muted small">学分奖励：<span th:text="${course.credit}">5</span> 分</p>
-                    <a th:href="@{'/student/play/' + ${course.courseId}}" class="btn btn-success w-100">开始学习</a>
-                </div>
+    <div class="col" th:each="course : ${courses}">
+        <div class="card h-100 course-card" th:classappend="${course.get('isFinished') == 1 ? 'border-success' : ''}">
+            
+            <div class="video-thumb">
+                <span style="font-size: 3rem;">▶️</span>
+                <span class="badge bg-primary category-badge" th:text="${course.get('category')}">分类</span>
+                
+                <span th:if="${course.get('isFinished') == 1}" 
+                      class="badge bg-success position-absolute" style="top:10px; left:10px;">✅ 已完成</span>
+                <span th:unless="${course.get('isFinished') == 1}" 
+                      class="badge bg-secondary position-absolute" style="top:10px; left:10px;">⏳ 未学习</span>
+            </div>
+
+            <div class="card-body">
+                <h5 class="card-title" th:text="${course.get('courseName')}">课程名称</h5>
+                <p class="text-muted small">学分奖励：<span th:text="${course.get('credit')}">5</span> 分</p>
+                
+                <a th:href="@{'/student/play/' + ${course.get('courseId')}}" 
+                   class="btn w-100" 
+                   th:classappend="${course.get('isFinished') == 1 ? 'btn-outline-success' : 'btn-primary'}"
+                   th:text="${course.get('isFinished') == 1 ? '再次复习' : '开始学习'}">
+                   开始学习
+                </a>
             </div>
         </div>
-        
-        <div class="col-12 text-center py-5" th:if="${#lists.isEmpty(courses)}">
-            <p class="text-muted">暂无可选课程，请联系管理员审核上传。</p>
-        </div>
     </div>
+</div>
 </div>
 <script th:src="@{/js/course-list.js}"></script>
 </body>

@@ -35,8 +35,21 @@ public class UploadServiceImpl implements UploadService {
         course.setCategory(category);
         course.setCredit(credit);
         course.setVideoPath(newFilename);
-        course.setAuditStatus(1); // 默认审核通过，方便测试
-        
+        course.setAuditStatus(1);
+
         courseMapper.insertCourse(course);
+    }
+
+    @Override
+    public void deleteCourse(Integer courseId) {
+        Course course = courseMapper.getCourseById(courseId);
+        if (course != null) {
+            String filePath = "D:/training/uploads/" + course.getVideoPath();
+            java.io.File file = new java.io.File(filePath);
+            if (file.exists()) {
+                file.delete();
+            }
+            courseMapper.deleteCourse(courseId);
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.rongdai.training.mapper;
 
 import com.rongdai.training.entity.Course;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -20,7 +21,6 @@ public interface CourseMapper {
     Course getCourseById(Integer courseId);
 
     // 3. 【核心补全】：新增课程方法
-    // 这里的字段名必须和你数据库 Courses 表的列名完全一致
     @Insert("INSERT INTO Courses (courseName, videoPath, category, credit, auditStatus) " +
             "VALUES (#{courseName}, #{videoPath}, #{category}, #{credit}, #{auditStatus})")
     void insertCourse(Course course);
@@ -31,4 +31,8 @@ public interface CourseMapper {
             "LEFT JOIN StudyRecords sr ON c.courseId = sr.courseId AND sr.userId = #{userId} " +
             "WHERE c.auditStatus = 1")
     List<Map<String, Object>> findCoursesWithStatus(@Param("userId") Integer userId);
+
+    // 5. 删除课程
+    @Delete("DELETE FROM Courses WHERE courseId = #{courseId}")
+    void deleteCourse(Integer courseId);
 }

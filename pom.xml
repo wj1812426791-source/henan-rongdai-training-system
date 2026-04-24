@@ -57,51 +57,51 @@
         </dependency>
     </dependencies>
 
-    <build>
+   <build>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
-                <excludes>
-                    <exclude>**/*.mp4</exclude>
-                    <exclude>**/*.wmv</exclude>
-                    <exclude>**/*.png</exclude>
-                    <exclude>**/*.jpg</exclude>
-                    <exclude>**/*.ttf</exclude>
-                </excludes>
+                <includes>
+                    <include>**/*.yml</include>
+                    <include>**/*.yaml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </includes>
             </resource>
+
             <resource>
                 <directory>src/main/resources</directory>
                 <filtering>false</filtering>
-                <includes>
-                    <include>**/*.mp4</include>
-                    <include>**/*.wmv</include>
-                    <include>**/*.png</include>
-                    <include>**/*.jpg</include>
-                    <include>**/*.ttf</include>
-                </includes>
+                <excludes>
+                    <include>**/*.yml</include>
+                    <include>**/*.yaml</include>
+                    <include>**/*.properties</include>
+                    <include>**/*.xml</include>
+                </excludes>
             </resource>
         </resources>
 
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.7.18</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
-                <configuration>
-                    <nonFilteredFileExtensions>
-                        <nonFilteredFileExtension>mp4</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>wmv</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>png</nonFilteredFileExtension>
-                        <nonFilteredFileExtension>jpg</nonFilteredFileExtension>
-                    </nonFilteredFileExtensions>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <plugins>
+        <plugin>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+        
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <version>3.1.0</version> <configuration>
+                <encoding>UTF-8</encoding>
+                <nonFilteredFileExtensions>
+                    <nonFilteredFileExtension>mp4</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>xlsx</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>xls</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>zip</nonFilteredFileExtension>
+                    <nonFilteredFileExtension>png</nonFilteredFileExtension>
+                </nonFilteredFileExtensions>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
 </project>
