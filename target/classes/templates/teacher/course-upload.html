@@ -15,7 +15,7 @@
 </head>
 <body>
 <div class="sidebar"></div>
-<script>var currentUserRole = 'teacher';</script>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
 <div class="main-content">
 <div class="container py-5">
     <div class="card shadow-sm mx-auto" style="max-width: 600px;">

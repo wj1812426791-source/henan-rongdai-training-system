@@ -19,7 +19,9 @@
 </head>
 <body>
 <div class="sidebar"></div>
-<script>var currentUserRole = 'student';</script>
+<script th:inline="javascript">
+    window.currentUserRole = /*[[${session.user?.role}]]*/ 'student';
+</script>
 <div class="main-content">
 
 

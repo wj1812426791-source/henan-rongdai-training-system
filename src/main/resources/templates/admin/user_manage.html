@@ -15,7 +15,7 @@
 </head>
 <body>
 <div class="sidebar"></div>
-<script>var currentUserRole = 'admin';</script>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
 <div class="main-content">
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
