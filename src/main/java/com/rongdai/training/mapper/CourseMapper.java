@@ -55,4 +55,8 @@ public interface CourseMapper {
             "category=#{category}, auditStatus=0, credit=#{credit} " +
             "WHERE courseId=#{courseId}")
     void updateCourse(Course course);
+
+    // 10. 查询教师名下的所有课程（不加状态限制）
+    @Select("SELECT * FROM Courses WHERE teacherId = #{tid}")
+    List<Course> findCoursesByTeacher(@Param("tid") Integer tid);
 }

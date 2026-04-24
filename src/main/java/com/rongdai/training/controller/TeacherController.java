@@ -39,9 +39,12 @@ public class TeacherController {
     }
 
     @GetMapping("/manage")
-    public String managePage(Model model) {
-        List<Course> courses = courseMapper.findAllActiveCourses();
-        model.addAttribute("courses", courses);
+    public String managePage(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("courses", courseMapper.findCoursesByTeacher(user.getUserId()));
         return "teacher/course_manage";
     }
 

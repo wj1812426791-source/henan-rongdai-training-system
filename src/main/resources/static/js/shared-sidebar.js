@@ -4,14 +4,17 @@ document.addEventListener('DOMContentLoaded', function() {
     var currentRole = roleInput ? roleInput.value : 'student';
 
     var menuItems = [];
+    var roleTitle = '';
 
     if (currentRole === 'teacher') {
+        roleTitle = '👨‍🏫 教师端';
         menuItems = [
             { href: '/teacher/upload', icon: '📤', text: '上传课程' },
             { href: '/teacher/manage', icon: '🛠️', text: '课程管理' },
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
         ];
     } else if (currentRole === 'admin') {
+        roleTitle = '⚙️ 管理端';
         menuItems = [
             { href: '/admin/teachers', icon: '👨‍🏫', text: '教师管理' },
             { href: '/admin/students', icon: '👨‍🎓', text: '学员管理' },
@@ -19,15 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
         ];
     } else {
+        roleTitle = '👨‍🎓 学员端';
         menuItems = [
             { href: '/student/courses', icon: '📚', text: '课程列表' },
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
         ];
     }
-
-    var roleTitle = '👨‍🎓 学员端';
-    if (currentRole === 'teacher') roleTitle = '👨‍🏫 教师端';
-    else if (currentRole === 'admin') roleTitle = '⚙️ 管理端';
 
     var sidebarHtml = '<h4>' + roleTitle + '</h4>';
     for (var i = 0; i < menuItems.length; i++) {
