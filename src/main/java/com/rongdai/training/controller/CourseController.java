@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class CourseController {
@@ -17,8 +18,8 @@ public class CourseController {
 
     @GetMapping("/student/courses")
     public String showCourseList(Model model) {
-        // 通过 Service 层获取数据
-        List<Course> courses = courseService.getActiveCourses();
+        Integer currentUserId = 2;
+        List<Map<String, Object>> courses = courseService.getCoursesForStudent(currentUserId);
         model.addAttribute("courses", courses);
         return "student/course-list";
     }

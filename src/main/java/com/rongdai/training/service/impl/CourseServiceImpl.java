@@ -6,6 +6,7 @@ import com.rongdai.training.service.CourseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CourseServiceImpl implements CourseService {
@@ -15,7 +16,11 @@ public class CourseServiceImpl implements CourseService {
 
     @Override
     public List<Course> getActiveCourses() {
-        // 调用 Mapper 查询 auditStatus = 1 的课程
         return courseMapper.findAllActiveCourses();
+    }
+
+    @Override
+    public List<Map<String, Object>> getCoursesForStudent(Integer userId) {
+        return courseMapper.findCoursesWithStatus(userId);
     }
 }
