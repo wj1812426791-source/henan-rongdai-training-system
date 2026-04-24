@@ -59,4 +59,20 @@ public interface CourseMapper {
     // 10. 查询教师名下的所有课程（不加状态限制）
     @Select("SELECT * FROM Courses WHERE teacherId = #{tid}")
     List<Course> findCoursesByTeacher(@Param("tid") Integer tid);
+
+    // 11. 查询所有分类
+    @Select("SELECT * FROM CourseCategories")
+    List<Map<String, Object>> findAllCategories();
+
+    // 12. 添加分类
+    @Insert("INSERT INTO CourseCategories (categoryName) VALUES (#{name})")
+    void insertCategory(@Param("name") String name);
+
+    // 13. 删除分类
+    @Delete("DELETE FROM CourseCategories WHERE categoryId = #{id}")
+    void deleteCategory(Integer id);
+
+    // 14. 更新分类名称
+    @Update("UPDATE CourseCategories SET categoryName = #{name} WHERE categoryId = #{id}")
+    void updateCategory(@Param("id") Integer id, @Param("name") String name);
 }
