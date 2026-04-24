@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
         menuItems = [
             { href: '/admin/teachers', icon: '👨‍🏫', text: '教师管理' },
             { href: '/admin/students', icon: '👨‍🎓', text: '学员管理' },
-            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
-            { href: '/admin/dashboard', icon: '📊', text: '管理看板' }
+            { href: '/admin/audit', icon: '📋', text: '课程审核' },
+            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
         ];
     } else {
         menuItems = [

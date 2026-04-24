@@ -32,7 +32,7 @@
                         <th>课程名称</th>
                         <th>分类</th>
                         <th>学分</th>
-                        <th>视频文件</th>
+                        <th>状态</th>
                         <th>操作</th>
                     </tr>
                 </thead>
@@ -42,9 +42,16 @@
                         <td th:text="${c.courseName}" class="fw-bold">名称</td>
                         <td><span class="badge bg-secondary" th:text="${c.category}">分类</span></td>
                         <td th:text="${c.credit}">5</td>
-                        <td class="small text-muted" th:text="${c.videoPath}">file.mp4</td>
                         <td>
-                            <button class="btn btn-danger btn-sm" 
+                            <span th:if="${c.auditStatus == 0}" class="badge bg-warning text-dark">⏳ 审核中</span>
+                            <span th:if="${c.auditStatus == 1}" class="badge bg-success">✅ 发布成功</span>
+                            <span th:if="${c.auditStatus == 2}" class="badge bg-danger">❌ 审核未通过</span>
+                        </td>
+                        <td>
+                            <a th:href="${c.videoPath}" target="_blank" class="btn btn-sm btn-outline-primary">预览</a>
+                            <button th:if="${c.auditStatus == 2}" class="btn btn-sm btn-info"
+                                    th:onclick="'reUpload(' + ${c.courseId} + ')'">重新上传</button>
+                            <button class="btn btn-danger btn-sm"
                                     th:onclick="'deleteCourse(' + ${c.courseId} + ')'">删除</button>
                         </td>
                     </tr>
@@ -57,5 +64,10 @@
 
 <script th:src="@{/js/shared-sidebar.js}"></script>
 <script th:src="@{/js/manage-logic.js}"></script>
+<script>
+function reUpload(courseId) {
+    location.href = '/teacher/upload?editId=' + courseId;
+}
+</script>
 </body>
 </html>

@@ -18,7 +18,7 @@ public class UploadServiceImpl implements UploadService {
     private final String UPLOAD_DIR = "D:/training/uploads/";
 
     @Override
-    public void uploadCourse(String courseName, String category, Integer credit, MultipartFile file) throws Exception {
+    public void uploadCourse(String courseName, String category, Integer credit, MultipartFile file, Integer teacherId) throws Exception {
         // 1. 文件名处理
         String originalFilename = file.getOriginalFilename();
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
@@ -35,7 +35,8 @@ public class UploadServiceImpl implements UploadService {
         course.setCategory(category);
         course.setCredit(credit);
         course.setVideoPath(newFilename);
-        course.setAuditStatus(1);
+        course.setTeacherId(teacherId);
+        course.setAuditStatus(0);
 
         courseMapper.insertCourse(course);
     }

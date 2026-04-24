@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>课程审核 - 管理端</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 220px; height: 100vh; background: #2c3e50; padding-top: 20px; }
+        .sidebar a { display: block; padding: 12px 20px; color: #ecf0f1; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: #3498db; }
+        .sidebar h4 { color: #ecf0f1; text-align: center; margin-bottom: 20px; padding: 0 20px; }
+        .main-content { margin-left: 220px; padding: 20px; }
+    </style>
+</head>
+<body>
+<div class="sidebar"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
+<div class="main-content">
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>📋 课程审核管理</h2>
+        <span class="badge bg-warning fs-6">待审核: <span th:text="${pendingList.size()}">0</span> 条</span>
+    </div>
+
+    <div class="card shadow">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>课程名称</th>
+                    <th>分类</th>
+                    <th>学分</th>
+                    <th>上传教师</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="c : ${pendingList}">
+                    <td th:text="${c.courseId}"></td>
+                    <td th:text="${c.courseName}"></td>
+                    <td><span class="badge bg-secondary" th:text="${c.category}"></span></td>
+                    <td th:text="${c.credit}"></td>
+                    <td th:text="${c.teacherName}"></td>
+                    <td>
+                        <button class="btn btn-success btn-sm" th:onclick="'auditCourse(' + ${c.courseId} + ', 1)'">通过</button>
+                        <button class="btn btn-danger btn-sm" th:onclick="'auditCourse(' + ${c.courseId} + ', 2)'">驳回</button>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(pendingList)}">
+                    <td colspan="6" class="text-center text-muted py-4">暂无待审核课程</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/js/shared-sidebar.js}"></script>
+<script>
+function auditCourse(courseId, status) {
+    if(confirm(status === 1 ? '确认通过此课程？' : '确认驳回此课程？')) {
+        fetch('/admin/api/audit', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'courseId=' + courseId + '&status=' + status
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                location.reload();
+            }
+        });
+    }
+}
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package com.rongdai.training.controller;
 
 import com.rongdai.training.entity.Course;
+import com.rongdai.training.entity.User;
 import com.rongdai.training.mapper.CourseMapper;
 import com.rongdai.training.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,15 @@ public class TeacherController {
     private CourseMapper courseMapper;
 
     @GetMapping("/upload")
-    public String uploadPage() {
+    public String uploadPage(@RequestParam(required = false) Integer editId, Model model) {
+        if (editId != null) {
+            Course oldCourse = courseMapper.findById(editId);
+            model.addAttribute("course", oldCourse);
+            model.addAttribute("isEdit", true);
+        } else {
+            model.addAttribute("course", new Course());
+            model.addAttribute("isEdit", false);
+        }
         return "teacher/course-upload";
     }
 
@@ -36,13 +46,26 @@ public class TeacherController {
     }
 
     @PostMapping("/doUpload")
-    public String doUpload(@RequestParam("courseName") String courseName,
+    public String doUpload(@RequestParam(required = false) Integer courseId,
+                           @RequestParam("courseName") String courseName,
                            @RequestParam("category") String category,
                            @RequestParam("credit") Integer credit,
-                           @RequestParam("videoFile") MultipartFile file) {
+                           @RequestParam(value = "videoFile", required = false) MultipartFile file,
+                           HttpSession session) {
         try {
-            uploadService.uploadCourse(courseName, category, credit, file);
-            return "redirect:/student/courses";
+            User user = (User) session.getAttribute("user");
+            if (courseId != null) {
+                Course course = new Course();
+                course.setCourseId(courseId);
+                course.setCourseName(courseName);
+                course.setCategory(category);
+                course.setCredit(credit);
+                course.setAuditStatus(0);
+                courseMapper.updateCourse(course);
+            } else {
+                uploadService.uploadCourse(courseName, category, credit, file, user.getUserId());
+            }
+            return "redirect:/teacher/manage";
         } catch (Exception e) {
             e.printStackTrace();
             return "error/500";

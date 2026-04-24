@@ -19,36 +19,40 @@
 <div class="main-content">
 <div class="container py-5">
     <div class="card shadow-sm mx-auto" style="max-width: 600px;">
-        <div class="card-header bg-dark text-white"><h5>发布新培训课程</h5></div>
+        <div class="card-header bg-dark text-white"><h5 th:text="${isEdit ? '重新上传课程' : '发布新培训课程'}">发布新培训课程</h5></div>
         <div class="card-body">
+            <div th:if="${isEdit}" class="alert alert-info">
+                您正在重新编辑审核未通过的课程，提交后将重新进入审核流程。
+            </div>
             <form id="uploadForm" action="/teacher/doUpload" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="courseId" th:value="${course.courseId}">
                 <div class="mb-3">
                     <label class="form-label">课程标题</label>
-                    <input type="text" name="courseName" class="form-control" required>
+                    <input type="text" name="courseName" class="form-control" th:value="${course.courseName}" required>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">所属分类</label>
                     <select name="category" class="form-control">
-                        <option value="业务常识">业务常识</option>
-                        <option value="安全合规">安全合规</option>
-                        <option value="技术培训">技术培训</option>
+                        <option value="业务常识" th:selected="${course.category == '业务常识'}">业务常识</option>
+                        <option value="安全合规" th:selected="${course.category == '安全合规'}">安全合规</option>
+                        <option value="技术培训" th:selected="${course.category == '技术培训'}">技术培训</option>
                     </select>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">奖励学分</label>
-                    <input type="number" name="credit" class="form-control" value="5">
+                    <input type="number" name="credit" class="form-control" th:value="${course.credit} ?: 5">
                 </div>
                 <div class="mb-3">
                     <label class="form-label">选择 MP4 视频</label>
-                    <input type="file" name="videoFile" id="videoFile" class="form-control" accept="video/mp4" required>
+                    <input type="file" name="videoFile" id="videoFile" class="form-control" accept="video/mp4" th:required="${!isEdit}">
                     <div id="fileHelp" class="form-text">仅支持 MP4 格式，文件大小不超过 100MB。</div>
                 </div>
-                
+
                 <div class="progress mb-3 d-none" id="progressContainer">
                     <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
                 </div>
 
-                <button type="submit" class="btn btn-primary w-100">开始上传</button>
+                <button type="submit" class="btn btn-primary w-100" th:text="${isEdit ? '保存并重新提交' : '开始上传'}">开始上传</button>
             </form>
         </div>
     </div>
