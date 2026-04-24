@@ -29,7 +29,7 @@ public interface UserMapper {
     @Delete("DELETE FROM Users WHERE userId = #{userId}")
     void deleteUser(Integer userId);
 
-    // 更新用户（可选）
-    @Update("UPDATE Users SET realName=#{realName}, deptId=#{deptId} WHERE userId=#{userId}")
+    // 更新用户
+    @Update("UPDATE Users SET username=#{username}, password=#{password}, realName=#{realName} WHERE userId=#{userId}")
     void updateUser(User user);
 }

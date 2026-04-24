@@ -34,4 +34,9 @@ public class AdminUserServiceImpl implements AdminUserService {
     public void removeUser(Integer userId) {
         userMapper.deleteUser(userId);
     }
+
+    @Override
+    public void updateUser(User user) {
+        userMapper.updateUser(user);
+    }
 }

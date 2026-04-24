@@ -7,4 +7,5 @@ public interface AdminUserService {
     List<User> getUsersByRole(String role);
     void addUser(User user);
     void removeUser(Integer userId);
+    void updateUser(User user);
 }

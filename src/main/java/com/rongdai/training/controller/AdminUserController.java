@@ -47,4 +47,11 @@ public class AdminUserController {
         // 根据角色跳回对应列表
         return "teacher".equals(user.getRole()) ? "redirect:/admin/teachers" : "redirect:/admin/students";
     }
+
+    // 修改用户
+    @PostMapping("/user/update")
+    public String updateUser(User user) {
+        adminUserService.updateUser(user);
+        return "teacher".equals(user.getRole()) ? "redirect:/admin/teachers" : "redirect:/admin/students";
+    }
 }

@@ -19,9 +19,7 @@
 </head>
 <body>
 <div class="sidebar"></div>
-<script th:inline="javascript">
-    window.currentUserRole = /*[[${session.user?.role}]]*/ 'student';
-</script>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
 <div class="main-content">
 
 
