@@ -81,7 +81,11 @@
                 </excludes>
             </resource>
         </resources>
-
+    <dependency>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
+    </dependency>
     <plugins>
         <plugin>
             <groupId>org.springframework.boot</groupId>
