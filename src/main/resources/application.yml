@@ -1,0 +1,46 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+
+spring:
+  # 1. 数据库连接配置 (针对 SQL Server 的 sa 账户优化)
+  datasource:
+    # 强制指定 trustServerCertificate=true 解决由于证书验证导致的登录失败
+    url: jdbc:sqlserver://localhost:1433;databaseName=TrainDB;encrypt=false;trustServerCertificate=true
+    username: sa
+    password: '132465798' # 建议加上单引号，防止特殊处理
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 15
+      connection-timeout: 30000
+
+  # 2. 外部资源路径映射 (D 盘视频目录)
+  web:
+    resources:
+      static-locations: 
+        - classpath:/static/
+        - file:D:/training/uploads/
+
+  # 3. 模板引擎配置
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    cache: false
+
+  # 4. 文件上传限制
+  servlet:
+    multipart:
+      max-file-size: 1024MB
+      max-request-size: 1024MB
+
+# 5. MyBatis 配置
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true 
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

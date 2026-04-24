@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>河南融代 - 学分荣誉榜</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f4f7f9; font-family: "Microsoft YaHei", sans-serif; }
+        .ranking-container { max-width: 900px; margin: 40px auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .header-title { text-align: center; color: #2c3e50; margin-bottom: 30px; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .rank-row { transition: all 0.3s; }
+        .rank-row:hover { background-color: #f1f9ff; transform: scale(1.01); }
+        .top-1 { background-color: #fff9e6 !important; font-weight: bold; }
+        .top-2 { background-color: #f8f9fa; }
+        .top-3 { background-color: #fffaf0; }
+        .medal { font-size: 1.2rem; margin-right: 8px; }
+        .credit-badge { background-color: #3498db; color: white; padding: 5px 12px; border-radius: 20px; font-size: 0.9rem; }
+        .dept-tag { color: #7f8c8d; font-size: 0.85rem; }
+        #searchInput { margin-bottom: 20px; border-radius: 20px; padding: 10px 20px; }
+    </style>
+</head>
+<body>
+
+<div class="ranking-container">
+    <h2 class="header-title">🏆 员工学分荣誉排行</h2>
+    
+    <input type="text" id="searchInput" class="form-control" placeholder="输入姓名或部门搜索...">
+
+    <table class="table table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>排名</th>
+                <th>姓名</th>
+                <th>所属部门</th>
+                <th>完成课程</th>
+                <th>累计学分</th>
+            </tr>
+        </thead>
+        <tbody id="rankingTable">
+            <tr th:each="row : ${rankingList}" 
+                class="rank-row" 
+                th:classappend="${row.get('rankNo') == 1 ? 'top-1' : (row.get('rankNo') == 2 ? 'top-2' : (row.get('rankNo') == 3 ? 'top-3' : ''))}">
+                
+                <td>
+                    <span th:if="${row.get('rankNo') == 1}" class="medal">👑</span>
+                    <span th:if="${row.get('rankNo') == 2}" class="medal">🥈</span>
+                    <span th:if="${row.get('rankNo') == 3}" class="medal">🥉</span>
+                    <span th:text="${row.get('rankNo')}">1</span>
+                </td>
+                
+                <td th:text="${row.get('username')}">姓名</td>
+                <td><span class="dept-tag" th:text="${row.get('deptName')}">部门</span></td>
+                <td th:text="${row.get('finishedCount')} ?: '0'">0</td>
+                <td>
+                    <span class="credit-badge" th:text="${row.get('totalCredit') != null ? row.get('totalCredit') : 0}">0</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(rankingList)}">
+                <td colspan="5" class="text-center text-muted py-4">暂 student 还没有学分数据哦~</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script th:src="@{/js/ranking-logic.js}"></script>
+
+</body>
+</html>
