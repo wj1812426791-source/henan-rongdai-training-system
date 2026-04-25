@@ -3,6 +3,7 @@ package com.rongdai.training.controller;
 import com.rongdai.training.entity.Course;
 import com.rongdai.training.entity.User;
 import com.rongdai.training.mapper.CourseMapper;
+import com.rongdai.training.mapper.ExamMapper;
 import com.rongdai.training.mapper.UserMapper;
 import com.rongdai.training.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class TeacherController {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ExamMapper examMapper;
 
     @GetMapping("/index")
     public String teacherIndex(@RequestParam(value = "standard", required = false) Integer standard,
@@ -152,6 +156,7 @@ public class TeacherController {
     public String auditPage(@RequestParam(defaultValue = "100") Integer standard, Model model) {
         model.addAttribute("standard", standard);
         model.addAttribute("qualifiedStudents", courseMapper.findQualifiedStudents(standard));
+        model.addAttribute("exams", examMapper.selectAllExams());
         return "teacher/audit_manage";
     }
 
@@ -164,6 +169,34 @@ public class TeacherController {
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
+        }
+        return result;
+    }
+
+    @PostMapping("/assignExam")
+    @ResponseBody
+    public Map<String, Object> assignExam(@RequestParam Integer userId, @RequestParam Integer examId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            courseMapper.upsertStudentExamInfo(userId, examId, 1);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
+        }
+        return result;
+    }
+
+    @PostMapping("/resetExam")
+    @ResponseBody
+    public Map<String, Object> resetExam(@RequestParam Integer userId) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            courseMapper.resetStudentExam(userId);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", e.getMessage());
         }
         return result;
     }

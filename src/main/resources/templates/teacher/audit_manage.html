@@ -5,10 +5,6 @@
     <title>学员培训审核</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <link rel="stylesheet" th:href="@{/css/shared.css}">
-    <style>
-        .audit-card { transition: 0.3s; }
-        .audit-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-    </style>
 </head>
 <body>
 
@@ -28,35 +24,59 @@
             </div>
         </div>
 
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            <div class="col" th:each="u : ${qualifiedStudents}">
-                <div class="card h-100 audit-card">
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <h5 class="fw-bold mb-0" th:text="${u['realName']}">姓名</h5>
-                            <span class="badge bg-success bg-opacity-10 text-success">已达标</span>
-                        </div>
-                        <p class="text-muted small mb-3">部门：<span th:text="${u['deptName']}">部门名称</span></p>
-                        <div class="bg-light p-3 rounded-3">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="small text-secondary">累计学分</span>
-                                <span class="h5 text-success mb-0" th:text="${u['currentCredit']}">0</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-transparent border-0 pb-3">
-                        <button class="btn btn-outline-success w-100 rounded-pill"
-                                th:attr="data-uid=${u['userId']}, data-credit=${u['currentCredit']}"
-                                onclick="approve(this)">
-                            确认审核通过
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="card shadow-sm border-0" style="border-radius: 15px;">
+            <div class="card-body p-4">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>学员姓名</th>
+                            <th>部门</th>
+                            <th>累计学分</th>
+                            <th>考试状态/分数</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="s : ${qualifiedStudents}">
+                            <td class="fw-bold" th:text="${s['realName']}">张三</td>
+                            <td class="text-muted" th:text="${s['deptName']}">技术部</td>
+                            <td><span class="badge bg-success" th:text="${s['currentCredit']}">105</span></td>
+                            <td>
+                                <span th:if="${s['examStatus'] == null or s['examStatus'] == 0}" class="badge bg-secondary">尚未开启考核</span>
+                                <span th:if="${s['examStatus'] == 1}" class="badge bg-warning text-dark">考核中...</span>
+                                <span th:if="${s['examStatus'] == 2}">
+                                    得分：<b class="text-danger" th:text="${s['examScore']}">85</b> 分
+                                </span>
+                            </td>
+                            <td>
+                                <div th:if="${s['examStatus'] == null or s['examStatus'] == 0}" class="input-group input-group-sm" style="width: 250px;">
+                                    <select class="form-select exam-select" th:id="'examSel_' + ${s['userId']}">
+                                        <option value="">选择试卷...</option>
+                                        <option th:each="e : ${exams}" th:value="${e['examId']}" th:text="${e['title']}"></option>
+                                    </select>
+                                    <button class="btn btn-primary" th:attr="data-uid=${s['userId']}" onclick="sendExam(this)">下发</button>
+                                </div>
 
-        <div th:if="${#lists.isEmpty(qualifiedStudents)}" class="text-center mt-5 py-5">
-            <p class="text-muted fs-5">暂无达到当前标准的学员记录</p>
+                                <div th:if="${s['examStatus'] == 2}">
+                                    <button class="btn btn-sm btn-success rounded-pill me-1"
+                                            th:attr="data-uid=${s['userId']}, data-credit=${s['currentCredit']}"
+                                            onclick="approveStudent(this)">审核通过</button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                            th:attr="data-uid=${s['userId']}"
+                                            onclick="reSendExam(this)">重新下发</button>
+                                </div>
+
+                                <div th:if="${s['examStatus'] == 1}">
+                                    <span class="text-muted small">考试进行中，请等待学员完成...</span>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(qualifiedStudents)}">
+                            <td colspan="5" class="text-center py-5 text-muted">暂无达到当前标准的学员记录</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -91,12 +111,40 @@
         }
     }
 
-    function approve(btn) {
-        const uid = btn.getAttribute('data-uid');
+    function sendExam(btn) {
+        const userId = btn.getAttribute('data-uid');
+        const examId = $('#examSel_' + userId).val();
+        if (!examId) {
+            alert('请先选择一套试卷！');
+            return;
+        }
+        $.post('/teacher/assignExam', { userId: userId, examId: examId }, function(res) {
+            if (res.success) {
+                alert('试卷已送达学员个人中心！');
+                location.reload();
+            } else {
+                alert('下发失败：' + res.message);
+            }
+        });
+    }
+
+    function reSendExam(btn) {
+        const userId = btn.getAttribute('data-uid');
+        if (confirm('重新下发将清空之前的成绩，确定吗？')) {
+            $.post('/teacher/resetExam', { userId: userId }, function(res) {
+                if (res.success) {
+                    location.reload();
+                }
+            });
+        }
+    }
+
+    function approveStudent(btn) {
+        const userId = btn.getAttribute('data-uid');
         const credit = btn.getAttribute('data-credit');
         if (confirm('是否确认该学员培训合格？')) {
             $.post('/teacher/audit/approve', {
-                userId: uid,
+                userId: userId,
                 credit: credit
             }, function(res) {
                 if (res.success) {

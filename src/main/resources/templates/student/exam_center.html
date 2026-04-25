@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>考核中心 - 河南融代培训系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/shared.css}">
+    <style>
+        .status-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 40px; text-align: center; background: white; }
+        .step-icon { font-size: 4rem; margin-bottom: 20px; }
+        .exam-area { margin-top: 30px; text-align: left; }
+        .question-box { background: #f8f9fa; border-radius: 15px; padding: 25px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar-container"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
+
+<div class="main-content">
+    <div class="container-fluid">
+        <h3 class="mb-4">📝 考核中心</h3>
+
+        <div class="status-card" style="max-width: 800px;">
+            <div th:if="${status == null}">
+                <div class="step-icon">🔒</div>
+                <h3>考核尚未开启</h3>
+                <p class="text-muted">您还未达到考核标准，请先完成课程学习。</p>
+                <a href="/student/index" class="btn btn-outline-primary rounded-pill px-4">前往学习</a>
+            </div>
+
+            <div th:if="${status != null && status.examStatus == 0}">
+                <div class="step-icon">⏳</div>
+                <h3 class="text-success">学分已达标！</h3>
+                <p class="text-muted">您的表现非常优秀，请耐心等待培训讲师下发考核试卷。</p>
+                <div class="alert alert-info">系统已自动将您加入"待考核"名单</div>
+                <a href="/student/index" class="btn btn-secondary rounded-pill">返回首页</a>
+            </div>
+
+            <div th:if="${status != null && status.examStatus == 1}">
+                <div class="step-icon">📝</div>
+                <h3>结业考试：<span th:text="${status.examTitle}">试卷标题</span></h3>
+                <hr>
+                <form id="examForm" class="exam-area">
+                    <div th:each="q, stat : ${examDetails}" class="question-box">
+                        <h5 class="mb-3"><span class="badge bg-primary me-2" th:text="${stat.count}">1</span><span th:text="${q['content']}">题目内容</span></h5>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" th:name="'ans_'+${q['questionId']}" value="A" required>
+                            <label class="form-check-label" th:text="'A. ' + ${q['optionA']}"></label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" th:name="'ans_'+${q['questionId']}" value="B">
+                            <label class="form-check-label" th:text="'B. ' + ${q['optionB']}"></label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" th:name="'ans_'+${q['questionId']}" value="C">
+                            <label class="form-check-label" th:text="'C. ' + ${q['optionC']}"></label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" th:name="'ans_'+${q['questionId']}" value="D">
+                            <label class="form-check-label" th:text="'D. ' + ${q['optionD']}"></label>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-primary w-100 py-3 mt-3" onclick="submitExam()">提交试卷</button>
+                </form>
+            </div>
+
+            <div th:if="${status != null && status.examStatus == 2}">
+                <div class="step-icon">🎉</div>
+                <h3 th:text="${status.examScore >= 60 ? '恭喜您完成考核！' : '考核未通过'}"></h3>
+                <div class="display-4 fw-bold mb-3" th:classappend="${status.examScore >= 60 ? 'text-success' : 'text-danger'}">
+                    [[${status.examScore}]] <small class="h4">分</small>
+                </div>
+                <p th:if="${status.examScore >= 60}" class="text-muted">您的成绩已同步给讲师，请等待最终认定。</p>
+                <p th:if="${status.examScore < 60}" class="text-danger">很抱歉，您的分数未达到合格线，请联系讲师申请重新下发试卷。</p>
+                <a href="/student/index" class="btn btn-secondary rounded-pill">返回首页</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/shared-sidebar.js}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function submitExam() {
+    if (!confirm('确定提交试卷吗？提交后不可修改。')) return;
+
+    const answers = [];
+    $('.question-box').each(function() {
+        const qId = $(this).find('input').attr('name').split('_')[1];
+        const val = $(this).find('input:checked').val();
+        if (qId && val) {
+            answers.push({ questionId: qId, answer: val });
+        }
+    });
+
+    if (answers.length === 0) {
+        alert('请至少回答一道题目！');
+        return;
+    }
+
+    $.ajax({
+        url: '/student/exam/submit',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(answers),
+        success: function(res) {
+            if (res.success) {
+                alert('考试结束！您的得分是：' + res.score);
+                location.reload();
+            } else {
+                alert('提交失败：' + res.message);
+            }
+        }
+    });
+}
+</script>
+</body>
+</html>

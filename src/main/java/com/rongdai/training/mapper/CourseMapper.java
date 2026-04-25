@@ -121,14 +121,16 @@ public interface CourseMapper {
     List<Map<String, Object>> findAllLearningPlans(Integer teacherId);
 
     // 23. 查询学分达标且未审核的学员
-    @Select("SELECT u.userId, u.realName, d.deptName, SUM(c.credit) as currentCredit " +
+    @Select("SELECT u.userId, u.realName, d.deptName, SUM(c.credit) as currentCredit, " +
+            "ISNULL(ts.examStatus, 0) as examStatus, ts.examScore " +
             "FROM Users u " +
             "JOIN Departments d ON u.deptId = d.deptId " +
             "JOIN StudyRecords sr ON u.userId = sr.userId " +
             "JOIN Courses c ON sr.courseId = c.courseId " +
+            "LEFT JOIN TrainingStatus ts ON u.userId = ts.userId " +
             "WHERE sr.isFinished = 1 " +
-            "AND u.userId NOT IN (SELECT userId FROM TrainingStatus WHERE status = 1) " +
-            "GROUP BY u.userId, u.realName, d.deptName " +
+            "AND (ts.status IS NULL OR ts.status = 0) " +
+            "GROUP BY u.userId, u.realName, d.deptName, ts.examStatus, ts.examScore " +
             "HAVING SUM(c.credit) >= #{standard}")
     List<Map<String, Object>> findQualifiedStudents(Integer standard);
 
@@ -170,4 +172,33 @@ public interface CourseMapper {
     // 30. 统计待审核课程数量
     @Select("SELECT COUNT(*) FROM Courses WHERE auditStatus = 0")
     int countPendingCourseAudits();
+
+    // 31. 更新学员考试信息（examId 和 examStatus）
+    @Update("UPDATE TrainingStatus SET examId = #{examId}, examStatus = #{examStatus} WHERE userId = #{userId}")
+    void updateStudentExamInfo(@Param("userId") Integer userId, @Param("examId") Integer examId, @Param("examStatus") Integer examStatus);
+
+    // 31. 下发试卷（兼容不存在记录的情况）
+    @Insert("IF NOT EXISTS (SELECT 1 FROM TrainingStatus WHERE userId = #{userId}) " +
+            "INSERT INTO TrainingStatus (userId, examId, examStatus, status) VALUES (#{userId}, #{examId}, #{examStatus}, 0) " +
+            "ELSE " +
+            "UPDATE TrainingStatus SET examId = #{examId}, examStatus = #{examStatus} WHERE userId = #{userId}")
+    void upsertStudentExamInfo(@Param("userId") Integer userId, @Param("examId") Integer examId, @Param("examStatus") Integer examStatus);
+
+    // 32. 重置学员考试状态
+    @Update("UPDATE TrainingStatus SET examId = NULL, examStatus = 0, examScore = NULL WHERE userId = #{userId}")
+    void resetStudentExam(Integer userId);
+
+    // 33. 查询学员考试状态
+    @Select("SELECT examStatus, examScore FROM TrainingStatus WHERE userId = #{userId}")
+    Map<String, Object> getStudentExamStatus(Integer userId);
+
+    // 34. 获取学员培训状态（包含examStatus, examId, examScore）
+    @Select("SELECT ts.*, e.title as examTitle FROM TrainingStatus ts " +
+            "LEFT JOIN Exam e ON ts.examId = e.examId " +
+            "WHERE ts.userId = #{userId}")
+    Map<String, Object> getTrainingStatus(Integer userId);
+
+    // 35. 更新学员考试成绩
+    @Update("UPDATE TrainingStatus SET examScore = #{score}, examStatus = #{examStatus} WHERE userId = #{userId}")
+    void updateExamResult(@Param("userId") Integer userId, @Param("score") Integer score, @Param("examStatus") Integer examStatus);
 }

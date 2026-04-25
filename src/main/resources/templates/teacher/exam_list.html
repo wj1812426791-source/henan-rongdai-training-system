@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>试卷管理 - 河南融代培训系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/shared.css}">
+</head>
+<body>
+
+<div class="sidebar" id="sidebar-container"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'teacher'">
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>📝 审核试卷库</h3>
+        <a href="/teacher/exam/add" class="btn btn-primary rounded-pill px-4">+ 新建试卷</a>
+    </div>
+
+    <div class="card shadow-sm border-0" style="border-radius: 15px;">
+        <div class="card-body p-4">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>试卷 ID</th>
+                        <th>试卷标题</th>
+                        <th>题目数量</th>
+                        <th>创建时间</th>
+                        <th class="text-center">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="e : ${exams}">
+                        <td th:text="${e['examId']}">1</td>
+                        <td class="fw-bold text-primary" th:text="${e['title']}">安全生产合规考试</td>
+                        <td><span class="badge bg-info text-dark">[[${e['qCount']}]] 道题</span></td>
+                        <td th:text="${#dates.format(e['createTime'], 'yyyy-MM-dd HH:mm')}">2026-04-25</td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-secondary rounded-pill me-1"
+                                    th:attr="data-id=${e['examId']}"
+                                    onclick="previewExam(this)">预览</button>
+                            <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                    th:attr="data-id=${e['examId']}"
+                                    onclick="delExam(this)">删除</button>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(exams)}">
+                        <td colspan="5" class="text-center py-5 text-muted">暂无试卷，请点击右上角新建</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">试卷预览</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                加载中...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/shared-sidebar.js}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function previewExam(btn) {
+        const examId = btn.getAttribute('data-id');
+        $.get('/teacher/exam/questions', { examId: examId }, function(res) {
+            let html = '';
+            if (res.data && res.data.length > 0) {
+                res.data.forEach(function(q, i) {
+                    html += '<div class="mb-3 p-3 bg-light rounded">';
+                    html += '<p class="mb-2"><strong>Q' + (i+1) + ':</strong> ' + q.content + ' <span class="badge bg-secondary ms-2">' + q.score + '分</span></p>';
+                    html += '<ul class="list-unstyled ms-4 mb-0">';
+                    html += '<li>A. ' + q.optionA + '</li>';
+                    html += '<li>B. ' + q.optionB + '</li>';
+                    html += '<li>C. ' + q.optionC + '</li>';
+                    html += '<li>D. ' + q.optionD + '</li>';
+                    html += '</ul>';
+                    html += '<p class="mb-0 mt-2 text-success"><strong>答案：' + q.answer + '</strong></p>';
+                    html += '</div>';
+                });
+            } else {
+                html = '<p class="text-center text-muted">暂无题目</p>';
+            }
+            $('#previewContent').html(html);
+            new bootstrap.Modal(document.getElementById('previewModal')).show();
+        });
+    }
+
+    function delExam(btn) {
+        const examId = btn.getAttribute('data-id');
+        if (confirm('确定要删除这张试卷吗？题目也将一并删除且不可恢复。')) {
+            $.post('/teacher/exam/delete', { examId: examId }, function(res) {
+                if (res.success) {
+                    location.reload();
+                } else {
+                    alert('删除失败：' + res.message);
+                }
+            });
+        }
+    }
+</script>
+</body>
+</html>
