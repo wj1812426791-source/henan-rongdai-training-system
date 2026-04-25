@@ -75,4 +75,19 @@ public interface CourseMapper {
     // 14. 更新分类名称
     @Update("UPDATE CourseCategories SET categoryName = #{name} WHERE categoryId = #{id}")
     void updateCategory(@Param("id") Integer id, @Param("name") String name);
+
+    // 15. 全员公开课：查所有审核通过的
+    @Select("SELECT * FROM Courses WHERE auditStatus = 1")
+    List<Course> findPublicCourses();
+
+    // 16. 部门必修课：联查 LearningPlans
+    @Select("SELECT c.*, lp.deadline " +
+            "FROM Courses c " +
+            "INNER JOIN LearningPlans lp ON c.courseId = lp.courseId " +
+            "WHERE c.auditStatus = 1 AND lp.deptId = #{deptId}")
+    List<Map<String, Object>> findDeptCourses(Integer deptId);
+
+    // 17. 查询课程详情
+    @Select("SELECT * FROM Courses WHERE courseId = #{courseId}")
+    Map<String, Object> findCourseDetailById(Integer courseId);
 }

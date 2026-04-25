@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
         roleTitle = '👨‍🎓 学员端';
         menuItems = [
-            { href: '/student/courses', icon: '📚', text: '课程列表' },
+            { href: '/student/public-courses', icon: '🌍', text: '全员公开课' },
+            { href: '/student/dept-courses', icon: '🎯', text: '部门必修课' },
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
         ];
     }

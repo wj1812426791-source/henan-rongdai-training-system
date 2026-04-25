@@ -15,21 +15,22 @@ public class UploadServiceImpl implements UploadService {
     @Autowired
     private CourseMapper courseMapper;
 
-    private final String UPLOAD_DIR = "D:/training/uploads/";
+    private String getUploadDir() {
+        return "D:/uploads/";
+    }
 
     @Override
     public void uploadCourse(String courseName, String category, Integer credit, MultipartFile file, Integer teacherId) throws Exception {
-        // 1. 文件名处理
+        String uploadDir = getUploadDir();
+
         String originalFilename = file.getOriginalFilename();
         String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
         String newFilename = UUID.randomUUID().toString() + suffix;
 
-        // 2. 保存到磁盘
-        File dir = new File(UPLOAD_DIR);
+        File dir = new File(uploadDir);
         if (!dir.exists()) dir.mkdirs();
-        file.transferTo(new File(UPLOAD_DIR + newFilename));
+        file.transferTo(new File(uploadDir + newFilename));
 
-        // 3. 数据入库
         Course course = new Course();
         course.setCourseName(courseName);
         course.setCategory(category);
@@ -45,7 +46,7 @@ public class UploadServiceImpl implements UploadService {
     public void deleteCourse(Integer courseId) {
         Course course = courseMapper.getCourseById(courseId);
         if (course != null) {
-            String filePath = "D:/training/uploads/" + course.getVideoPath();
+            String filePath = getUploadDir() + course.getVideoPath();
             java.io.File file = new java.io.File(filePath);
             if (file.exists()) {
                 file.delete();

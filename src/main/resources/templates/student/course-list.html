@@ -11,63 +11,42 @@
         .sidebar a:hover, .sidebar a.active { background: #34495e; color: #3498db; }
         .sidebar h4 { color: #ecf0f1; text-align: center; margin-bottom: 20px; padding: 0 20px; }
         .main-content { margin-left: 220px; padding: 20px; }
-        .course-card { transition: transform 0.2s; border: none; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .course-card:hover { transform: translateY(-5px); }
-        .video-thumb { 
-            height: 160px; 
-            background: #2c3e50; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white;
-            border-radius: 10px 10px 0 0;
-        }
-        .category-badge { position: absolute; top: 10px; right: 10px; }
     </style>
 </head>
 <body>
 <div class="sidebar"></div>
 <input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
 <div class="main-content">
-
-
 <div class="container py-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>📚 我的课程中心</h2>
-        <a href="/student/ranking" class="btn btn-outline-primary">查看荣誉榜</a>
-    </div>
+    <h3 class="mb-4" th:text="${courseType == 'public' ? '🌍 全员公开课 (不计入考核)' : '🎯 部门必修课 (计入考核)'}"></h3>
 
-    <div class="row row-cols-1 row-cols-md-3 g-4">
-    <div class="col" th:each="course : ${courses}">
-        <div class="card h-100 course-card" th:classappend="${course.get('isFinished') == 1 ? 'border-success' : ''}">
-            
-            <div class="video-thumb">
-                <span style="font-size: 3rem;">▶️</span>
-                <span class="badge bg-primary category-badge" th:text="${course.get('category')}">分类</span>
-                
-                <span th:if="${course.get('isFinished') == 1}" 
-                      class="badge bg-success position-absolute" style="top:10px; left:10px;">✅ 已完成</span>
-                <span th:unless="${course.get('isFinished') == 1}" 
-                      class="badge bg-secondary position-absolute" style="top:10px; left:10px;">⏳ 未学习</span>
-            </div>
+    <table class="table table-hover bg-white shadow-sm rounded">
+        <thead class="table-light">
+            <tr>
+                <th>课程名称</th>
+                <th>分类</th>
+                <th th:text="${courseType == 'dept' ? '截止日期' : '课程学分'}"></th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="c : ${courses}">
+                <td th:text="${c.courseName ?: c.get('courseName')}" class="fw-bold"></td>
+                <td><span class="badge bg-info" th:text="${c.category ?: c.get('category')}"></span></td>
 
-            <div class="card-body">
-                <h5 class="card-title" th:text="${course.get('courseName')}">课程名称</h5>
-                <p class="text-muted small">学分奖励：<span th:text="${course.get('credit')}">5</span> 分</p>
-                
-                <a th:href="@{'/student/play/' + ${course.get('courseId')}}" 
-                   class="btn w-100" 
-                   th:classappend="${course.get('isFinished') == 1 ? 'btn-outline-success' : 'btn-primary'}"
-                   th:text="${course.get('isFinished') == 1 ? '再次复习' : '开始学习'}">
-                   开始学习
-                </a>
-            </div>
-        </div>
-    </div>
+                <td th:if="${courseType == 'dept'}" th:text="${c.deadline ?: c.get('deadline')}" class="text-danger"></td>
+                <td th:if="${courseType == 'public'}" th:text="${c.credit ?: c.get('credit')}"></td>
+
+                <td>
+                    <a th:href="@{/student/play(courseId=${c.courseId ?: c.get('courseId')}, type=${courseType})}"
+                       class="btn btn-primary btn-sm">去学习</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
 </div>
 </div>
 
 <script th:src="@{/js/shared-sidebar.js}"></script>
-<script th:src="@{/js/course-list.js}"></script>
 </body>
 </html>
