@@ -48,7 +48,29 @@ public class TeacherController {
             return "redirect:/login";
         }
         model.addAttribute("courses", courseMapper.findCoursesByTeacher(user.getUserId()));
+        model.addAttribute("departments", courseMapper.findAllDepts());
         return "teacher/course_manage";
+    }
+
+    @PostMapping("/dispatch")
+    @ResponseBody
+    public Map<String, Object> dispatchCourse(@RequestParam Integer courseId,
+                                              @RequestParam Integer deptId,
+                                              @RequestParam String deadline) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            if (courseMapper.checkPlanExistence(courseId, deptId) > 0) {
+                result.put("success", false);
+                result.put("msg", "该部门已存在此课程的学习计划");
+                return result;
+            }
+            courseMapper.dispatchCourseToDept(courseId, deptId, deadline);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("msg", "下发失败：" + e.getMessage());
+        }
+        return result;
     }
 
     @PostMapping("/doUpload")

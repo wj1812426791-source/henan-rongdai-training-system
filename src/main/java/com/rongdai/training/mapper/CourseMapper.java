@@ -90,4 +90,18 @@ public interface CourseMapper {
     // 17. 查询课程详情
     @Select("SELECT * FROM Courses WHERE courseId = #{courseId}")
     Map<String, Object> findCourseDetailById(Integer courseId);
+
+    // 18. 下发课程到部门
+    @Insert("INSERT INTO LearningPlans (courseId, deptId, deadline) VALUES (#{courseId}, #{deptId}, #{deadline})")
+    void dispatchCourseToDept(@Param("courseId") Integer courseId,
+                              @Param("deptId") Integer deptId,
+                              @Param("deadline") String deadline);
+
+    // 19. 检查该部门是否已经有了这个课的计划
+    @Select("SELECT COUNT(*) FROM LearningPlans WHERE courseId = #{courseId} AND deptId = #{deptId}")
+    int checkPlanExistence(@Param("courseId") Integer courseId, @Param("deptId") Integer deptId);
+
+    // 20. 获取所有部门
+    @Select("SELECT * FROM Departments")
+    List<Map<String, Object>> findAllDepts();
 }

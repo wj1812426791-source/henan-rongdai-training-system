@@ -32,4 +32,27 @@ public interface UserMapper {
     // 更新用户
     @Update("UPDATE Users SET username=#{username}, password=#{password}, realName=#{realName} WHERE userId=#{userId}")
     void updateUser(User user);
+
+    // 联表查询：查出学员信息及其所属部门名称
+    @Select("SELECT u.*, d.deptName FROM Users u " +
+            "LEFT JOIN Departments d ON u.deptId = d.deptId " +
+            "WHERE u.role = 'student'")
+    List<Map<String, Object>> findAllStudentsWithDept();
+
+    // 更新学员所属部门
+    @Update("UPDATE Users SET deptId = #{deptId} WHERE userId = #{userId}")
+    void updateStudentDept(@Param("userId") Integer userId, @Param("deptId") Integer deptId);
+
+    // 获取所有部门（用于编辑时的下拉框）
+    @Select("SELECT * FROM Departments")
+    List<Map<String, Object>> findAllDepts();
+
+    // 更新学员基础信息（含部门）
+    @Update("UPDATE Users SET username=#{username}, realName=#{realName}, " +
+            "password=#{password}, deptId=#{deptId} WHERE userId=#{userId}")
+    void updateStudent(User user);
+
+    // 删除学员
+    @Delete("DELETE FROM Users WHERE userId = #{userId} AND role = 'student'")
+    void deleteStudent(Integer userId);
 }
