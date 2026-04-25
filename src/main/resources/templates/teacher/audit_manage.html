@@ -26,8 +26,8 @@
 
         <div class="card shadow-sm border-0" style="border-radius: 15px;">
             <div class="card-body p-4">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="table-light">
+                <table class="table align-middle mb-0">
+                    <thead>
                         <tr>
                             <th>学员姓名</th>
                             <th>部门</th>
@@ -38,36 +38,46 @@
                     </thead>
                     <tbody>
                         <tr th:each="s : ${qualifiedStudents}">
-                            <td class="fw-bold" th:text="${s['realName']}">张三</td>
+                            <td class="fw-bold" th:text="${s['realName']}">演示学员</td>
                             <td class="text-muted" th:text="${s['deptName']}">技术部</td>
                             <td><span class="badge bg-success" th:text="${s['currentCredit']}">105</span></td>
                             <td>
-                                <span th:if="${s['examStatus'] == null or s['examStatus'] == 0}" class="badge bg-secondary">尚未开启考核</span>
-                                <span th:if="${s['examStatus'] == 1}" class="badge bg-warning text-dark">考核中...</span>
-                                <span th:if="${s['examStatus'] == 2}">
-                                    得分：<b class="text-danger" th:text="${s['examScore']}">85</b> 分
+                                <span th:if="${s['status'] == 1}">
+                                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> 已结业</span>
+                                </span>
+                                <span th:if="${s['status'] == 0 or s['status'] == null}">
+                                    <span th:if="${s['examStatus'] == null or s['examStatus'] == 0}" class="text-muted small">未开启考核</span>
+                                    <span th:if="${s['examStatus'] == 1}" class="text-warning small">考核中...</span>
+                                    <span th:if="${s['examStatus'] == 2}">
+                                        得分：<b class="exam-score-val text-danger" th:text="${s['examScore']}">0</b> 分
+                                    </span>
                                 </span>
                             </td>
                             <td>
-                                <div th:if="${s['examStatus'] == null or s['examStatus'] == 0}" class="input-group input-group-sm" style="width: 250px;">
-                                    <select class="form-select exam-select" th:id="'examSel_' + ${s['userId']}">
-                                        <option value="">选择试卷...</option>
-                                        <option th:each="e : ${exams}" th:value="${e['examId']}" th:text="${e['title']}"></option>
-                                    </select>
-                                    <button class="btn btn-primary" th:attr="data-uid=${s['userId']}" onclick="sendExam(this)">下发</button>
+                                <div th:if="${s['status'] == 1}">
+                                    <span class="text-muted small">已完成培训</span>
                                 </div>
 
-                                <div th:if="${s['examStatus'] == 2}">
-                                    <button class="btn btn-sm btn-success rounded-pill me-1"
-                                            th:attr="data-uid=${s['userId']}, data-credit=${s['currentCredit']}"
-                                            onclick="approveStudent(this)">审核通过</button>
-                                    <button class="btn btn-sm btn-outline-danger rounded-pill"
-                                            th:attr="data-uid=${s['userId']}"
-                                            onclick="reSendExam(this)">重新下发</button>
-                                </div>
+                                <div th:if="${s['status'] == 0 or s['status'] == null}">
+                                    <div th:if="${s['examStatus'] == 2}">
+                                        <button th:if="${s['examScore'] >= 60}" class="btn btn-sm btn-success rounded-pill"
+                                                th:attr="data-uid=${s['userId']}, data-credit=${s['currentCredit']}"
+                                                onclick="approveStudent(this)">审核通过</button>
+                                        <span th:if="${s['examScore'] < 60}" class="badge bg-danger me-2">成绩不及格</span>
+                                        <button class="btn btn-sm btn-outline-danger rounded-pill"
+                                                th:attr="data-uid=${s['userId']}"
+                                                onclick="reSendExam(this)">重新下发</button>
+                                    </div>
 
-                                <div th:if="${s['examStatus'] == 1}">
-                                    <span class="text-muted small">考试进行中，请等待学员完成...</span>
+                                    <span th:if="${s['examStatus'] == 1}" class="text-warning small">学员正在考试...</span>
+
+                                    <div th:if="${s['examStatus'] == 0 or s['examStatus'] == null}" class="input-group input-group-sm" style="width: 220px;">
+                                        <select class="form-select" th:id="'examSel_' + ${s['userId']}">
+                                            <option value="">请选择试卷</option>
+                                            <option th:each="e : ${exams}" th:value="${e['examId']}" th:text="${e['title']}"></option>
+                                        </select>
+                                        <button class="btn btn-primary" th:attr="data-uid=${s['userId']}" onclick="sendExam(this)">下发</button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>

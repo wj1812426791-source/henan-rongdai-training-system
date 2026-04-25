@@ -122,7 +122,7 @@ public interface CourseMapper {
 
     // 23. 查询学分达标且未审核的学员
     @Select("SELECT u.userId, u.realName, d.deptName, SUM(c.credit) as currentCredit, " +
-            "ISNULL(ts.examStatus, 0) as examStatus, ts.examScore " +
+            "ISNULL(ts.examStatus, 0) as examStatus, ts.examScore, ISNULL(ts.status, 0) as status " +
             "FROM Users u " +
             "JOIN Departments d ON u.deptId = d.deptId " +
             "JOIN StudyRecords sr ON u.userId = sr.userId " +
@@ -130,7 +130,7 @@ public interface CourseMapper {
             "LEFT JOIN TrainingStatus ts ON u.userId = ts.userId " +
             "WHERE sr.isFinished = 1 " +
             "AND (ts.status IS NULL OR ts.status = 0) " +
-            "GROUP BY u.userId, u.realName, d.deptName, ts.examStatus, ts.examScore " +
+            "GROUP BY u.userId, u.realName, d.deptName, ts.examStatus, ts.examScore, ts.status " +
             "HAVING SUM(c.credit) >= #{standard}")
     List<Map<String, Object>> findQualifiedStudents(Integer standard);
 
@@ -177,12 +177,16 @@ public interface CourseMapper {
     @Update("UPDATE TrainingStatus SET examId = #{examId}, examStatus = #{examStatus} WHERE userId = #{userId}")
     void updateStudentExamInfo(@Param("userId") Integer userId, @Param("examId") Integer examId, @Param("examStatus") Integer examStatus);
 
-    // 31. 下发试卷（兼容不存在记录的情况）
-    @Insert("IF NOT EXISTS (SELECT 1 FROM TrainingStatus WHERE userId = #{userId}) " +
-            "INSERT INTO TrainingStatus (userId, examId, examStatus, status) VALUES (#{userId}, #{examId}, #{examStatus}, 0) " +
-            "ELSE " +
-            "UPDATE TrainingStatus SET examId = #{examId}, examStatus = #{examStatus} WHERE userId = #{userId}")
-    void upsertStudentExamInfo(@Param("userId") Integer userId, @Param("examId") Integer examId, @Param("examStatus") Integer examStatus);
+    // 31. 下发试卷（使用MERGE语句，存在即更新，不存在即插入）
+    @Update("MERGE INTO TrainingStatus AS target " +
+            "USING (SELECT #{userId} AS userId) AS source " +
+            "ON (target.userId = source.userId) " +
+            "WHEN MATCHED THEN " +
+            "    UPDATE SET examId = #{examId}, examStatus = 1, examScore = NULL, status = 0 " +
+            "WHEN NOT MATCHED THEN " +
+            "    INSERT (userId, examId, examStatus, status) " +
+            "    VALUES (#{userId}, #{examId}, 1, 0);")
+    void assignOrUpdateExam(@Param("userId") Integer userId, @Param("examId") Integer examId);
 
     // 32. 重置学员考试状态
     @Update("UPDATE TrainingStatus SET examId = NULL, examStatus = 0, examScore = NULL WHERE userId = #{userId}")

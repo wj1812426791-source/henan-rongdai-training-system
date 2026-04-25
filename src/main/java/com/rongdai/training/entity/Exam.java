@@ -7,6 +7,7 @@ public class Exam {
     private Integer examId;
     private String title;
     private Integer totalScore;
+    private Integer passScore;
     private Date createTime;
     private Integer creatorId;
     private List<ExamQuestions> questions;
@@ -17,6 +18,8 @@ public class Exam {
     public void setTitle(String title) { this.title = title; }
     public Integer getTotalScore() { return totalScore; }
     public void setTotalScore(Integer totalScore) { this.totalScore = totalScore; }
+    public Integer getPassScore() { return passScore; }
+    public void setPassScore(Integer passScore) { this.passScore = passScore; }
     public Date getCreateTime() { return createTime; }
     public void setCreateTime(Date createTime) { this.createTime = createTime; }
     public Integer getCreatorId() { return creatorId; }

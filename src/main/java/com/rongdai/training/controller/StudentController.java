@@ -1,9 +1,11 @@
 package com.rongdai.training.controller;
 
 import com.rongdai.training.entity.ExamQuestions;
+import com.rongdai.training.entity.StudyRecord;
 import com.rongdai.training.entity.User;
 import com.rongdai.training.mapper.CourseMapper;
 import com.rongdai.training.mapper.ExamMapper;
+import com.rongdai.training.mapper.StudyRecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,6 +25,9 @@ public class StudentController {
 
     @Autowired
     private ExamMapper examMapper;
+
+    @Autowired
+    private StudyRecordMapper studyRecordMapper;
 
     @GetMapping("/public-courses")
     public String publicCourses(Model model) {
@@ -123,6 +128,35 @@ public class StudentController {
 
         result.put("success", true);
         result.put("score", score);
+        return result;
+    }
+
+    @PostMapping("/submit-progress")
+    @ResponseBody
+    public Map<String, Object> submitProgress(@RequestParam Integer courseId, @RequestParam String type, HttpSession session) {
+        Map<String, Object> result = new HashMap<>();
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            result.put("success", false);
+            result.put("message", "请先登录");
+            return result;
+        }
+
+        StudyRecord record = studyRecordMapper.findRecord(user.getUserId(), courseId);
+        if (record == null) {
+            record = new StudyRecord();
+            record.setUserId(user.getUserId());
+            record.setCourseId(courseId);
+            record.setProgress(100);
+            record.setIsFinished(1);
+            studyRecordMapper.insertRecord(record);
+        } else {
+            record.setProgress(100);
+            record.setIsFinished(1);
+            studyRecordMapper.updateRecord(record);
+        }
+
+        result.put("success", true);
         return result;
     }
 }

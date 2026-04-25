@@ -67,13 +67,14 @@
 
             <div th:if="${status != null && status.examStatus == 2}">
                 <div class="step-icon">🎉</div>
-                <h3 th:text="${status.examScore >= 60 ? '恭喜您完成考核！' : '考核未通过'}"></h3>
-                <div class="display-4 fw-bold mb-3" th:classappend="${status.examScore >= 60 ? 'text-success' : 'text-danger'}">
-                    [[${status.examScore}]] <small class="h4">分</small>
+                <h3>考核结果</h3>
+                <div class="h4 mb-3">
+                    您的得分：<span class="text-primary" th:text="${status.examScore}"></span>
+                    <small class="text-muted">/ 60分及格</small>
                 </div>
-                <p th:if="${status.examScore >= 60}" class="text-muted">您的成绩已同步给讲师，请等待最终认定。</p>
-                <p th:if="${status.examScore < 60}" class="text-danger">很抱歉，您的分数未达到合格线，请联系讲师申请重新下发试卷。</p>
-                <a href="/student/index" class="btn btn-secondary rounded-pill">返回首页</a>
+                <div th:if="${status.examScore >= 60}" class="alert alert-success mt-3">恭喜，考试达标！请等待讲师最终审核。</div>
+                <div th:if="${status.examScore < 60}" class="alert alert-danger mt-3">未达标，请联系讲师重新参加考核。</div>
+                <a href="/student/index" class="btn btn-secondary rounded-pill mt-3">返回首页</a>
             </div>
         </div>
     </div>

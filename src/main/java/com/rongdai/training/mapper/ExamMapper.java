@@ -10,7 +10,7 @@ import java.util.Map;
 @Mapper
 public interface ExamMapper {
 
-    @Insert("INSERT INTO Exam (title, creatorId) VALUES (#{title}, #{creatorId})")
+    @Insert("INSERT INTO Exam (title, creatorId, createTime, passScore) VALUES (#{title}, #{creatorId}, GETDATE(), 60)")
     @Options(useGeneratedKeys = true, keyProperty = "examId")
     void insertExam(Exam exam);
 

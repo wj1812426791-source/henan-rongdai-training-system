@@ -178,7 +178,7 @@ public class TeacherController {
     public Map<String, Object> assignExam(@RequestParam Integer userId, @RequestParam Integer examId) {
         Map<String, Object> result = new HashMap<>();
         try {
-            courseMapper.upsertStudentExamInfo(userId, examId, 1);
+            courseMapper.assignOrUpdateExam(userId, examId);
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
