@@ -27,6 +27,9 @@ public class TeacherController {
 
     @GetMapping("/upload")
     public String uploadPage(@RequestParam(required = false) Integer editId, Model model) {
+        List<Map<String, Object>> categories = courseMapper.findAllCategories();
+        model.addAttribute("categories", categories);
+
         if (editId != null) {
             Course oldCourse = courseMapper.findById(editId);
             model.addAttribute("course", oldCourse);
@@ -55,8 +58,13 @@ public class TeacherController {
                            @RequestParam("credit") Integer credit,
                            @RequestParam(value = "videoFile", required = false) MultipartFile file,
                            HttpSession session) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            System.out.println("上传失败：用户未登录或 Session 已失效");
+            return "redirect:/login";
+        }
+
         try {
-            User user = (User) session.getAttribute("user");
             if (courseId != null) {
                 Course course = new Course();
                 course.setCourseId(courseId);

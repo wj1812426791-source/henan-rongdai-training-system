@@ -32,10 +32,12 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label">所属分类</label>
-                    <select name="category" class="form-control">
-                        <option value="业务常识" th:selected="${course.category == '业务常识'}">业务常识</option>
-                        <option value="安全合规" th:selected="${course.category == '安全合规'}">安全合规</option>
-                        <option value="技术培训" th:selected="${course.category == '技术培训'}">技术培训</option>
+                    <select name="category" class="form-control" required>
+                        <option value="">-- 请选择课程分类 --</option>
+                        <option th:each="cat : ${categories}"
+                                th:value="${cat.categoryName}"
+                                th:text="${cat.categoryName}"
+                                th:selected="${course.category == cat.categoryName}"></option>
                     </select>
                 </div>
                 <div class="mb-3">
