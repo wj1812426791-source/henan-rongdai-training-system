@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>管理控制台 - 河南融代培训系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/shared.css}">
+    <style>
+        .admin-stat-card {
+            border-radius: 15px; border: none; padding: 20px; background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: 0.3s;
+        }
+        .admin-stat-card:hover { transform: translateY(-5px); }
+        .icon-box { width: 50px; height: 50px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 15px; }
+
+        .bg-users { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+        .bg-depts { background: rgba(155, 89, 182, 0.1); color: #9b59b6; }
+        .bg-courses { background: rgba(26, 188, 156, 0.1); color: #1abc9c; }
+        .bg-alerts { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+
+        .quick-nav { border-radius: 15px; background: white; padding: 20px; }
+        .quick-nav-item {
+            padding: 15px; border-radius: 10px; border: 1px solid #eee;
+            text-align: center; text-decoration: none; color: #333; transition: 0.2s;
+        }
+        .quick-nav-item:hover { background: #f8f9fa; border-color: #1abc9c; color: #1abc9c; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar-container"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'admin'">
+
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">系统运行概览</h2>
+            <p class="text-muted">欢迎回来，[[${session.user?.realName}]]。以下是今日全站运行数据。</p>
+        </div>
+        <div class="text-end">
+            <div class="h5 mb-0" th:text="${#dates.format(#dates.createNow(), 'HH:mm')}">14:00</div>
+            <div class="small text-muted" th:text="${#dates.format(#dates.createNow(), 'yyyy年MM月dd日')}">2026年04月25日</div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <div class="col-md-3">
+            <div class="admin-stat-card">
+                <div class="icon-box bg-users">👥</div>
+                <div class="h3 fw-bold mb-0" th:text="${totalUsers}">0</div>
+                <div class="small text-muted">全系统用户总数</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-stat-card">
+                <div class="icon-box bg-depts">🏢</div>
+                <div class="h3 fw-bold mb-0" th:text="${totalDepts}">0</div>
+                <div class="small text-muted">部门架构数量</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-stat-card">
+                <div class="icon-box bg-courses">📚</div>
+                <div class="h3 fw-bold mb-0" th:text="${totalCourses}">0</div>
+                <div class="small text-muted">已上线视频课程</div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="admin-stat-card">
+                <div class="icon-box bg-alerts">⏳</div>
+                <div class="h3 fw-bold mb-0 text-danger" th:text="${pendingCourseAudit}">0</div>
+                <div class="small text-muted">待审核课程资源</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="quick-nav shadow-sm mb-4">
+                <h5 class="fw-bold mb-4">🛠️ 快速管理通道</h5>
+                <div class="row g-3">
+                    <div class="col-4">
+                        <a href="/admin/teachers" class="quick-nav-item d-block">
+                            <div class="fs-4 mb-2">👨‍🏫</div>
+                            <div>教师管理</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="/admin/students" class="quick-nav-item d-block">
+                            <div class="fs-4 mb-2">�‍🎓</div>
+                            <div>学员管理</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="/admin/dept/manage" class="quick-nav-item d-block">
+                            <div class="fs-4 mb-2">🏢</div>
+                            <div>部门管理</div>
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <a href="/admin/audit" class="quick-nav-item d-block position-relative">
+                            <div class="fs-4 mb-2">⚖️</div>
+                            <div>课程审核</div>
+                            <span th:if="${pendingCourseAudit > 0}" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" th:text="${pendingCourseAudit}"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+                <h5 class="fw-bold mb-3">📝 系统动态</h5>
+                <div class="small text-muted">
+                    <div class="py-2 border-bottom">● 管理员 [[${session.user?.realName}]] 登录了系统 - 刚才</div>
+                    <div class="py-2 border-bottom">● 数据库自动备份已完成 - 2小时前</div>
+                    <div class="py-2">● 系统版本 v2.7.18 运行正常</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4 h-100" style="border-radius: 15px; background: linear-gradient(135deg, #34495e, #2c3e50); color: white;">
+                <h5 class="mb-3">🛡️ 安全状态</h5>
+                <div class="d-flex align-items-center mb-4">
+                    <div class="display-6 me-3 text-success">✔</div>
+                    <div>
+                        <div class="fw-bold">防火墙开启</div>
+                        <div class="small opacity-50">拦截所有未经授权的访问</div>
+                    </div>
+                </div>
+                <hr class="opacity-25">
+                <p class="small opacity-75">作为管理员，您可以直接通过"部门管理"模块对组织机构进行调整，所有更改将即时同步至用户资料中。</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:src="@{/js/shared-sidebar.js}"></script>
+</body>
+</html>

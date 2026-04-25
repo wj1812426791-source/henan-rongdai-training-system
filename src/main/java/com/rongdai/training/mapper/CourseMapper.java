@@ -162,4 +162,12 @@ public interface CourseMapper {
     // 28. 统计已结业人数
     @Select("SELECT COUNT(*) FROM TrainingStatus WHERE status = 1")
     int countPassedStudents();
+
+    // 29. 统计所有课程数量
+    @Select("SELECT COUNT(*) FROM Courses")
+    int countAllCourses();
+
+    // 30. 统计待审核课程数量
+    @Select("SELECT COUNT(*) FROM Courses WHERE auditStatus = 0")
+    int countPendingCourseAudits();
 }

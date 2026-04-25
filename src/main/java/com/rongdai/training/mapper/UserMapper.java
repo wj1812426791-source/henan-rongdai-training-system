@@ -60,6 +60,10 @@ public interface UserMapper {
     @Select("SELECT COUNT(*) FROM Users WHERE role = 'student'")
     int countStudents();
 
+    // 统计所有用户数量
+    @Select("SELECT COUNT(*) FROM Users")
+    int countAllUsers();
+
     // 根据部门ID获取部门名称
     @Select("SELECT deptName FROM Departments WHERE deptId = #{deptId}")
     String getDeptNameById(Integer deptId);

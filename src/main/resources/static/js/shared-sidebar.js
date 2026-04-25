@@ -21,8 +21,10 @@ document.addEventListener('DOMContentLoaded', function() {
     } else if (currentRole === 'admin') {
         roleTitle = '⚙️ 管理端';
         menuItems = [
+            { href: '/admin/index', icon: '🏠', text: '首页概览' },
             { href: '/admin/teachers', icon: '👨‍🏫', text: '教师管理' },
             { href: '/admin/students', icon: '👨‍🎓', text: '学员管理' },
+            { href: '/admin/dept/manage', icon: '🏢', text: '部门管理' },
             { href: '/admin/audit', icon: '📋', text: '课程审核' },
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
             { href: '/user/profile', icon: '👤', text: '个人中心' }
