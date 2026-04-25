@@ -80,6 +80,10 @@ public interface CourseMapper {
     @Select("SELECT * FROM Courses WHERE auditStatus = 1")
     List<Course> findPublicCourses();
 
+    // 15-2. 全员公开课返回Map格式
+    @Select("SELECT * FROM Courses WHERE auditStatus = 1")
+    List<Map<String, Object>> findPublicCoursesMap();
+
     // 16. 部门必修课：联查 LearningPlans
     @Select("SELECT c.*, lp.deadline " +
             "FROM Courses c " +
@@ -115,4 +119,27 @@ public interface CourseMapper {
             "JOIN Departments d ON lp.deptId = d.deptId " +
             "WHERE c.teacherId = #{teacherId}")
     List<Map<String, Object>> findAllLearningPlans(Integer teacherId);
+
+    // 23. 查询学分达标且未审核的学员
+    @Select("SELECT u.userId, u.realName, d.deptName, SUM(c.credit) as currentCredit " +
+            "FROM Users u " +
+            "JOIN Departments d ON u.deptId = d.deptId " +
+            "JOIN StudyRecords sr ON u.userId = sr.userId " +
+            "JOIN Courses c ON sr.courseId = c.courseId " +
+            "WHERE sr.isFinished = 1 " +
+            "AND u.userId NOT IN (SELECT userId FROM TrainingStatus WHERE status = 1) " +
+            "GROUP BY u.userId, u.realName, d.deptName " +
+            "HAVING SUM(c.credit) >= #{standard}")
+    List<Map<String, Object>> findQualifiedStudents(Integer standard);
+
+    // 24. 保存审核通过记录
+    @Insert("INSERT INTO TrainingStatus (userId, finalCredit, status, auditTime) " +
+            "VALUES (#{userId}, #{credit}, 1, GETDATE())")
+    void saveTrainingStatus(@Param("userId") Integer userId, @Param("credit") Integer credit);
+
+    // 25. 获取用户累计学分
+    @Select("SELECT ISNULL(SUM(c.credit), 0) FROM StudyRecords sr " +
+            "JOIN Courses c ON sr.courseId = c.courseId " +
+            "WHERE sr.userId = #{userId} AND sr.isFinished = 1")
+    Integer getUserTotalCredit(Integer userId);
 }

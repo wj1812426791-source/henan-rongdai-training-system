@@ -23,10 +23,10 @@ public class StudentController {
 
     @GetMapping("/public-courses")
     public String publicCourses(Model model) {
-        List<Course> courses = courseMapper.findPublicCourses();
-        model.addAttribute("courses", courses);
+        model.addAttribute("courses", courseMapper.findPublicCoursesMap());
+        model.addAttribute("categories", courseMapper.findAllCategories());
         model.addAttribute("courseType", "public");
-        return "student/course-list";
+        return "student/course_card_list";
     }
 
     @GetMapping("/dept-courses")
@@ -35,10 +35,10 @@ public class StudentController {
         if (user == null) {
             return "redirect:/login";
         }
-        List<Map<String, Object>> courses = courseMapper.findDeptCourses(user.getDeptId());
-        model.addAttribute("courses", courses);
+        model.addAttribute("courses", courseMapper.findDeptCourses(user.getDeptId()));
+        model.addAttribute("categories", courseMapper.findAllCategories());
         model.addAttribute("courseType", "dept");
-        return "student/course-list";
+        return "student/course_card_list";
     }
 
     @GetMapping("/play")
@@ -47,5 +47,18 @@ public class StudentController {
         model.addAttribute("course", course);
         model.addAttribute("courseType", type);
         return "student/video-play";
+    }
+
+    @GetMapping("/index")
+    public String studentIndex(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        Integer currentCredit = courseMapper.getUserTotalCredit(user.getUserId());
+        Integer standard = 100;
+        model.addAttribute("currentCredit", currentCredit != null ? currentCredit : 0);
+        model.addAttribute("standard", standard);
+        return "student/index";
     }
 }

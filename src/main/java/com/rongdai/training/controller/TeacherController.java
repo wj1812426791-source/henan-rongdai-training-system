@@ -128,4 +128,24 @@ public class TeacherController {
         }
         return result;
     }
+
+    @GetMapping("/audit")
+    public String auditPage(@RequestParam(defaultValue = "100") Integer standard, Model model) {
+        model.addAttribute("standard", standard);
+        model.addAttribute("qualifiedStudents", courseMapper.findQualifiedStudents(standard));
+        return "teacher/audit_manage";
+    }
+
+    @PostMapping("/audit/approve")
+    @ResponseBody
+    public Map<String, Object> approve(@RequestParam Integer userId, @RequestParam Integer credit) {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            courseMapper.saveTrainingStatus(userId, credit);
+            result.put("success", true);
+        } catch (Exception e) {
+            result.put("success", false);
+        }
+        return result;
+    }
 }

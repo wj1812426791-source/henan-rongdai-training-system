@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>课程中心</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 220px; height: 100vh; background: #2c3e50; padding-top: 20px; }
+        .sidebar a { display: block; padding: 12px 20px; color: #ecf0f1; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: #3498db; }
+        .sidebar h4 { color: #ecf0f1; text-align: center; margin-bottom: 20px; padding: 0 20px; }
+        .main-content { margin-left: 220px; padding: 20px; }
+        .course-card {
+            border-radius: 15px;
+            transition: transform 0.2s;
+            overflow: hidden;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+        }
+        .filter-btn.active {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .video-placeholder {
+            height: 160px;
+            background: linear-gradient(45deg, #2c3e50, #4ca1af);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="sidebar"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
+<div class="main-content">
+<div class="container p-4">
+    <h3 class="mb-4" th:text="${courseType == 'public' ? '🌍 全员公开课' : '🎯 部门必修课'}"></h3>
+
+    <div class="mb-4 d-flex gap-2 flex-wrap">
+        <button class="btn btn-outline-primary filter-btn active" onclick="filterCategory('all')">全部</button>
+        <button th:each="cat : ${categories}"
+                class="btn btn-outline-primary filter-btn"
+                th:text="${cat.categoryName}"
+                th:data-cat="${cat.categoryName}"
+                onclick="filterCategory(this.getAttribute('data-cat'))"></button>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+        <div class="col course-item" th:each="c : ${courses}" th:data-category="${c['category']}">
+            <div class="card h-100 course-card">
+                <div class="video-placeholder">
+                    <i class="bi bi-play-circle">🎬</i>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title text-truncate" th:text="${c['courseName']}"></h5>
+                    <p class="card-text">
+                        <span class="badge bg-light text-dark" th:text="${c['category']}">分类</span>
+                        <span class="text-primary float-end" th:text="${c['credit']} + ' 学分'"></span>
+                    </p>
+                    <p th:if="${courseType == 'dept' and c['deadline'] != null}" class="text-danger small mb-2">
+                        ⏳ 截止: [[${c['deadline']}]]
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-3">
+                    <a th:href="@{/student/play(courseId=${c['courseId']}, type=${courseType})}"
+                       class="btn btn-primary w-100 rounded-pill">去学习</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="noDataMsg" class="text-center mt-5 d-none">
+        <p class="text-muted">该分类下暂无课程</p>
+    </div>
+</div>
+</div>
+
+<script th:src="@{/js/shared-sidebar.js}"></script>
+<script>
+function filterCategory(catName) {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if(btn.innerText === catName || (catName === 'all' && btn.innerText === '全部')) {
+            btn.classList.add('active');
+        }
+    });
+
+    let visibleCount = 0;
+    document.querySelectorAll('.course-item').forEach(item => {
+        if(catName === 'all' || item.getAttribute('data-category') === catName) {
+            item.style.display = 'block';
+            visibleCount++;
+        } else {
+            item.style.display = 'none';
+        }
+    });
+
+    document.getElementById('noDataMsg').classList.toggle('d-none', visibleCount > 0);
+}
+</script>
+</body>
+</html>
