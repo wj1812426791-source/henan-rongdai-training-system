@@ -14,7 +14,6 @@
 
 <div class="sidebar" id="sidebar-container"></div>
 <input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'teacher'">
-<input type="hidden" id="backendStandard" th:value="${standard}">
 
 <div class="main-content">
     <div class="container-fluid">
@@ -25,7 +24,7 @@
                 <span class="fw-bold">🚩 结业学分线：</span>
                 <input type="number" id="creditInput" class="form-control" style="width: 120px;">
                 <button class="btn btn-primary px-4" onclick="updateStandard()">保存并更新列表</button>
-                <span class="text-muted small">当前正在审核累计满 <b class="text-primary" th:text="${standard}"></b> 分的学员</span>
+                <span class="text-muted small">当前正在审核累计满 <b class="text-primary" id="currentStdDisplay">[[${standard}]]</b> 分的学员</span>
             </div>
         </div>
 
@@ -65,25 +64,36 @@
 <script th:src="@{/js/shared-sidebar.js}"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        var backendStd = document.getElementById('backendStandard').value;
-        var localStd = localStorage.getItem('training_std');
-        document.getElementById('creditInput').value = localStd || backendStd;
-    });
+    (function() {
+        const params = new URLSearchParams(window.location.search);
+        const currentStdInUrl = params.get('standard');
+        const savedStd = localStorage.getItem('training_std') || 100;
+
+        if (currentStdInUrl === null) {
+            window.location.href = window.location.pathname + '?standard=' + savedStd;
+            return;
+        } else if (currentStdInUrl !== savedStd) {
+            localStorage.setItem('training_std', currentStdInUrl);
+        }
+
+        $(document).ready(function() {
+            $('#creditInput').val(currentStdInUrl || savedStd);
+        });
+    })();
 
     function updateStandard() {
-        var val = document.getElementById('creditInput').value;
-        if (!val || val <= 0) {
+        const val = $('#creditInput').val();
+        if (val && val > 0) {
+            localStorage.setItem('training_std', val);
+            window.location.href = '/teacher/audit?standard=' + val;
+        } else {
             alert("请输入正确的学分分值");
-            return;
         }
-        localStorage.setItem('training_std', val);
-        window.location.href = '/teacher/audit?standard=' + val;
     }
 
     function approve(btn) {
-        var uid = btn.getAttribute('data-uid');
-        var credit = btn.getAttribute('data-credit');
+        const uid = btn.getAttribute('data-uid');
+        const credit = btn.getAttribute('data-credit');
         if (confirm('是否确认该学员培训合格？')) {
             $.post('/teacher/audit/approve', {
                 userId: uid,

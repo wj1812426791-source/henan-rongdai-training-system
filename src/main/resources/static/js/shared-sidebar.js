@@ -8,13 +8,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (currentRole === 'teacher') {
         roleTitle = '👨‍🏫 教师端';
+        var savedStd = localStorage.getItem('training_std') || 100;
         menuItems = [
             { href: '/teacher/index', icon: '🏠', text: '首页概览' },
             { href: '/teacher/upload', icon: '📤', text: '上传课程' },
             { href: '/teacher/manage', icon: '🛠️', text: '课程管理' },
             { href: '/teacher/plan', icon: '📅', text: '下发计划' },
             { href: '/teacher/categories', icon: '📁', text: '分类管理' },
-            { href: '/teacher/audit', icon: '🎓', text: '培训审核' },
+            { href: '/teacher/audit?standard=' + savedStd, icon: '🎓', text: '培训审核' },
             { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
             { href: '/user/profile', icon: '👤', text: '个人中心' }
         ];
