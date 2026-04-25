@@ -104,4 +104,15 @@ public interface CourseMapper {
     // 20. 获取所有部门
     @Select("SELECT * FROM Departments")
     List<Map<String, Object>> findAllDepts();
+
+    // 21. 查询该教师名下所有已审核通过的课程
+    @Select("SELECT * FROM Courses WHERE teacherId = #{teacherId} AND auditStatus = 1")
+    List<Course> findPublishedCoursesByTeacher(Integer teacherId);
+
+    // 22. 查出该教师下发的所有计划，并关联课程名和部门名
+    @Select("SELECT lp.*, c.courseName, d.deptName FROM LearningPlans lp " +
+            "JOIN Courses c ON lp.courseId = c.courseId " +
+            "JOIN Departments d ON lp.deptId = d.deptId " +
+            "WHERE c.teacherId = #{teacherId}")
+    List<Map<String, Object>> findAllLearningPlans(Integer teacherId);
 }

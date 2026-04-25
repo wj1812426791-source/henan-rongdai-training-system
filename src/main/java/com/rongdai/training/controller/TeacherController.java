@@ -48,8 +48,19 @@ public class TeacherController {
             return "redirect:/login";
         }
         model.addAttribute("courses", courseMapper.findCoursesByTeacher(user.getUserId()));
-        model.addAttribute("departments", courseMapper.findAllDepts());
         return "teacher/course_manage";
+    }
+
+    @GetMapping("/plan")
+    public String planPage(HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        model.addAttribute("publishedCourses", courseMapper.findPublishedCoursesByTeacher(user.getUserId()));
+        model.addAttribute("departments", courseMapper.findAllDepts());
+        model.addAttribute("plans", courseMapper.findAllLearningPlans(user.getUserId()));
+        return "teacher/plan_manage";
     }
 
     @PostMapping("/dispatch")
