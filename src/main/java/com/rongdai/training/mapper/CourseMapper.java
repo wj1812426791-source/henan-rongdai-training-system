@@ -142,4 +142,24 @@ public interface CourseMapper {
             "JOIN Courses c ON sr.courseId = c.courseId " +
             "WHERE sr.userId = #{userId} AND sr.isFinished = 1")
     Integer getUserTotalCredit(Integer userId);
+
+    // 26. 统计教师名下的课程数
+    @Select("SELECT COUNT(*) FROM Courses WHERE teacherId = #{teacherId}")
+    int countCoursesByTeacher(Integer teacherId);
+
+    // 27. 统计待审核人数（基于学分标准）
+    @Select("SELECT COUNT(*) FROM (" +
+            "  SELECT u.userId FROM Users u " +
+            "  JOIN StudyRecords sr ON u.userId = sr.userId " +
+            "  JOIN Courses c ON sr.courseId = c.courseId " +
+            "  WHERE sr.isFinished = 1 " +
+            "  AND u.userId NOT IN (SELECT userId FROM TrainingStatus WHERE status = 1) " +
+            "  GROUP BY u.userId " +
+            "  HAVING SUM(c.credit) >= #{standard}" +
+            ") as t")
+    int countPendingAuditsByStandard(Integer standard);
+
+    // 28. 统计已结业人数
+    @Select("SELECT COUNT(*) FROM TrainingStatus WHERE status = 1")
+    int countPassedStudents();
 }

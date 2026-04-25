@@ -5,101 +5,112 @@
     <title>学员个人中心</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
     <style>
-        body { background-color: #f0f2f5; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; }
-        .sidebar { position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #2c3e50; color: white; padding-top: 20px; }
-        .main-content { margin-left: 240px; padding: 40px; }
-        
-        /* 状态大卡片 */
-        .status-card {
-            border-radius: 20px;
+        body { background-color: #f4f7f6; font-family: 'PingFang SC', sans-serif; margin: 0; }
+        .sidebar { position: fixed; left: 0; top: 0; width: 220px; height: 100vh; background: #2c3e50; padding-top: 20px; z-index: 100; }
+        .sidebar a { display: block; padding: 12px 20px; color: #bdc3c7; text-decoration: none; transition: 0.3s; }
+        .sidebar a:hover, .sidebar a.active { background: #34495e; color: #fff; border-left: 4px solid #1abc9c; }
+        .sidebar h4 { color: #fff; text-align: center; margin-bottom: 20px; padding: 0 20px; }
+        .main-content { margin-left: 220px; padding: 40px; }
+        .stat-card {
+            border-radius: 15px;
             border: none;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-        }
-        
-        .status-header {
-            padding: 40px;
-            text-align: center;
-            color: white;
-        }
-        
-        /* 通过状态的颜色 */
-        .bg-passed { background: linear-gradient(135deg, #2ecc71, #27ae60); }
-        /* 未通过状态的颜色 */
-        .bg-pending { background: linear-gradient(135deg, #f1c40f, #f39c12); }
-        
-        .status-icon { font-size: 4rem; margin-bottom: 15px; }
-        
-        .info-group {
-            display: flex;
-            justify-content: space-around;
-            padding: 30px;
-            background: #fff;
-        }
-        
-        .info-item { text-align: center; }
-        .info-value { font-size: 1.8rem; font-weight: bold; display: block; color: #2c3e50; }
-        .info-label { color: #7f8c8d; font-size: 0.9rem; }
-
-        .btn-action {
-            border-radius: 12px;
-            padding: 12px 30px;
-            font-weight: bold;
+            padding: 25px;
             transition: 0.3s;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
         }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .stat-icon { font-size: 2.5rem; opacity: 0.8; }
+        .stat-count { font-size: 2rem; font-weight: bold; margin: 10px 0; color: #2c3e50; }
+        .stat-label { color: #7f8c8d; font-size: 0.9rem; }
+        .progress-section {
+            border-radius: 15px;
+            background: #fff;
+            padding: 25px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .btn-custom {
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .btn-custom:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-<div class="sidebar">
-    <h4 class="text-center">培训系统</h4>
-    </div>
+<div class="sidebar" id="sidebar-container"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
 
 <div class="main-content">
-    <div class="container">
-        <h2 class="mb-4">你好，<span th:text="${session.user?.realName}">学员</span> 👋</h2>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>您好，[[${session.user?.realName}]] 同学</h2>
+        <span class="text-muted">今天是：[[${#dates.format(#dates.createNow(), 'yyyy年MM月dd日')}]]</span>
+    </div>
 
-        <div class="card status-card">
-            
-            <div th:if="${currentCredit >= standard}" class="status-header bg-passed">
-                <div class="status-icon">🎉</div>
-                <h2 class="fw-bold">恭喜！您已通过本次培训</h2>
-                <p class="opacity-75">您的表现非常出色，所有考核指标均已达标。</p>
+    <div class="row g-4 mb-4">
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="stat-icon">📚</div>
+                <div class="stat-count" th:text="${currentCredit}">0</div>
+                <div class="stat-label">当前累计学分</div>
             </div>
-
-            <div th:unless="${currentCredit >= standard}" class="status-header bg-pending">
-                <div class="status-icon">📺</div>
-                <h2 class="fw-bold">学习进行中</h2>
-                <p class="opacity-75">目前尚未达到结业标准，请尽快完成视频观看。</p>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-count" th:text="${standard}">100</div>
+                <div class="stat-label">培训达标要求</div>
             </div>
+        </div>
+        <div class="col-md-4">
+            <div class="stat-card text-center" th:classappend="${currentCredit >= standard} ? 'border-success border-3'">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-count" th:classappend="${currentCredit >= standard} ? 'text-success'" th:text="${currentCredit >= standard} ? '已达标' : '进行中'">进行中</div>
+                <div class="stat-label">当前状态</div>
+            </div>
+        </div>
+    </div>
 
-            <div class="info-group border-bottom">
-                <div class="info-item">
-                    <span class="info-value" th:text="${currentCredit}">0</span>
-                    <span class="info-label">当前累计学分</span>
-                </div>
-                <div class="info-item border-start border-end px-5">
-                    <span class="info-value" th:text="${standard}">100</span>
-                    <span class="info-label">培训达标要求</span>
-                </div>
-                <div class="info-item">
-                    <span class="info-value">[[${currentCredit >= standard ? '100%' : (currentCredit * 100 / standard) + '%'}]]</span>
-                    <span class="info-label">完成进度</span>
+    <div class="progress-section mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">📊 学习进度</h5>
+            <span class="text-muted">[[${currentCredit * 100 / standard}]]%</span>
+        </div>
+        <div class="progress" style="height: 20px;">
+            <div class="progress-bar" role="progressbar"
+                 th:style="'width: ' + ${currentCredit * 100 / standard} + '%'"
+                 th:classappend="${currentCredit >= standard} ? ' bg-success' : ' bg-primary'"
+                 aria-valuemin="0" aria-valuemax="100"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm p-4" style="border-radius: 15px;">
+                <h5 class="fw-bold mb-3">🚀 快速开始</h5>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="/student/dept-courses" class="btn btn-primary btn-custom">🎯 部门必修课</a>
+                    <a href="/student/public-courses" class="btn btn-outline-primary btn-custom">🌍 全员公开课</a>
+                    <a href="/student/ranking" class="btn btn-outline-success btn-custom">🏆 荣誉榜</a>
                 </div>
             </div>
-
-            <div class="p-4 text-center">
-                <a th:href="@{/student/courses}" class="btn btn-primary btn-action shadow-sm" th:if="${currentCredit < standard}">
-                    继续观看视频
-                </a>
-                <a th:href="@{/student/certificate}" class="btn btn-success btn-action shadow-sm" th:if="${currentCredit >= standard}">
-                    查看结业证书
-                </a>
+        </div>
+        <div class="col-md-4">
+            <div class="card shadow-sm p-4 text-center" style="border-radius: 15px; background: linear-gradient(135deg, #34495e, #2c3e50); color: white;">
+                <h6 class="opacity-75">温馨提示</h6>
+                <p class="mt-3" th:if="${currentCredit < standard}">
+                    您还需要 <b>[[${standard - currentCredit}]]</b> 学分即可达标，加油！
+                </p>
+                <p class="mt-3" th:unless="${currentCredit < standard}">
+                    恭喜！您已完成本阶段培训任务！
+                </p>
             </div>
         </div>
     </div>
 </div>
 
+<script th:src="@{/js/shared-sidebar.js}"></script>
 </body>
 </html>

@@ -55,4 +55,8 @@ public interface UserMapper {
     // 删除学员
     @Delete("DELETE FROM Users WHERE userId = #{userId} AND role = 'student'")
     void deleteStudent(Integer userId);
+
+    // 统计学员总数
+    @Select("SELECT COUNT(*) FROM Users WHERE role = 'student'")
+    int countStudents();
 }

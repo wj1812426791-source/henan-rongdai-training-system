@@ -42,8 +42,8 @@ public class AuthController {
         if (user != null) {
             session.setAttribute("user", user);
             if ("admin".equals(user.getRole())) return "redirect:/admin/teachers";
-            if ("teacher".equals(user.getRole())) return "redirect:/teacher/manage";
-            return "redirect:/student/courses";
+            if ("teacher".equals(user.getRole())) return "redirect:/teacher/index";
+            return "redirect:/student/index";
         }
         model.addAttribute("error", "用户名或密码错误");
         return "auth/login";

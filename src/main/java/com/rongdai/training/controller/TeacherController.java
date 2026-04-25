@@ -3,6 +3,7 @@ package com.rongdai.training.controller;
 import com.rongdai.training.entity.Course;
 import com.rongdai.training.entity.User;
 import com.rongdai.training.mapper.CourseMapper;
+import com.rongdai.training.mapper.UserMapper;
 import com.rongdai.training.service.UploadService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -24,6 +25,24 @@ public class TeacherController {
 
     @Autowired
     private CourseMapper courseMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @GetMapping("/index")
+    public String teacherIndex(@RequestParam(value = "standard", required = false) Integer standard,
+                               HttpSession session, Model model) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+        int auditStd = (standard != null) ? standard : 100;
+        model.addAttribute("studentCount", userMapper.countStudents());
+        model.addAttribute("courseCount", courseMapper.countCoursesByTeacher(user.getUserId()));
+        model.addAttribute("pendingAuditCount", courseMapper.countPendingAuditsByStandard(auditStd));
+        model.addAttribute("passedCount", courseMapper.countPassedStudents());
+        return "teacher/index";
+    }
 
     @GetMapping("/upload")
     public String uploadPage(@RequestParam(required = false) Integer editId, Model model) {
