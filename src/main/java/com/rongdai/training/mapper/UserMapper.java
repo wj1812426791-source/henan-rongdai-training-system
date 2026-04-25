@@ -59,4 +59,16 @@ public interface UserMapper {
     // 统计学员总数
     @Select("SELECT COUNT(*) FROM Users WHERE role = 'student'")
     int countStudents();
+
+    // 根据部门ID获取部门名称
+    @Select("SELECT deptName FROM Departments WHERE deptId = #{deptId}")
+    String getDeptNameById(Integer deptId);
+
+    // 更新用户资料（个人中心）
+    @Update("UPDATE Users SET username=#{username}, realName=#{realName} WHERE userId=#{userId}")
+    void updateProfile(User user);
+
+    // 修改密码
+    @Update("UPDATE Users SET password=#{password} WHERE userId=#{userId}")
+    void updatePassword(@Param("userId") Integer userId, @Param("password") String password);
 }

@@ -4,30 +4,8 @@
     <meta charset="UTF-8">
     <title>教师工作台</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/shared.css}">
     <style>
-        body { background-color: #f4f7f6; font-family: 'PingFang SC', sans-serif; margin: 0; }
-        /* 侧边栏 */
-        .sidebar { position: fixed; left: 0; top: 0; width: 240px; height: 100vh; background: #2c3e50; color: white; padding-top: 20px; z-index: 1000; }
-        .sidebar a { display: block; padding: 12px 25px; color: #bdc3c7; text-decoration: none; transition: 0.3s; }
-        .sidebar a:hover, .sidebar a.active { background: #34495e; color: #fff; border-left: 4px solid #1abc9c; }
-        
-        .main-content { margin-left: 240px; padding: 40px; }
-        
-        /* 统计卡片样式 */
-        .stat-card {
-            border-radius: 15px;
-            border: none;
-            padding: 25px;
-            transition: 0.3s;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        .stat-icon { font-size: 2.5rem; opacity: 0.8; }
-        .stat-count { font-size: 2rem; font-weight: bold; margin: 10px 0; color: #2c3e50; }
-        .stat-label { color: #7f8c8d; font-size: 0.9rem; }
-
-        /* 快捷操作区 */
         .quick-action {
             border-radius: 15px;
             background: #fff;
@@ -43,7 +21,7 @@
 
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>您好，[[${session.user.realName}]] 老师</h2>
+        <h2>您好，[[${session.user?.realName}]] 老师</h2>
         <span class="text-muted">今天是：[[${#dates.format(#dates.createNow(), 'yyyy年MM月dd日')}]]</span>
     </div>
 
@@ -88,17 +66,17 @@
                     <a href="/teacher/audit" class="btn btn-outline-success rounded-pill px-4">查看审核队列</a>
                 </div>
             </div>
-            
-            <div class="card shadow-sm p-4" style="border-radius: 15px;">
+
+            <div class="card shadow-sm p-4">
                 <h5 class="fw-bold mb-3">📢 系统公告</h5>
                 <ul class="list-unstyled">
                     <li class="mb-2">🔹 请及时审核已达到达标学分的学员。</li>
-                    <li class="mb-2">🔹 新上传视频后请在“课程管理”中提交审核。</li>
+                    <li class="mb-2">🔹 新上传视频后请在"课程管理"中提交审核。</li>
                     <li>🔹 定期检查学员学习进度，确保培训按计划完成。</li>
                 </ul>
             </div>
         </div>
-        
+
         <div class="col-md-4">
             <div class="card shadow-sm p-4 text-center" style="border-radius: 15px; background: linear-gradient(135deg, #34495e, #2c3e50); color: white;">
                 <h6 class="opacity-75">管理建议</h6>

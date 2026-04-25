@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心 - 河南融代培训系统</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" th:href="@{/css/shared.css}">
+    <style>
+        .profile-card { border-radius: 20px; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.08); background: white; max-width: 700px; margin: auto; }
+        .card-header-ui { background: linear-gradient(135deg, #2c3e50, #000); color: white; border-radius: 20px 20px 0 0; padding: 30px; text-align: center; }
+        .form-label { font-weight: 600; color: #34495e; }
+        .readonly-input { background-color: #f8f9fa !important; border: 1px dashed #dee2e6; cursor: not-allowed; }
+        .save-btn { border-radius: 12px; padding: 12px 40px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar-container"></div>
+<input type="hidden" id="userRole" th:value="${session.user?.role} ?: 'student'">
+
+<div class="main-content">
+    <div class="card profile-card">
+        <div class="card-header card-header-ui">
+            <h4 class="mb-0">账号资料维护</h4>
+        </div>
+        <div class="card-body p-4 p-md-5">
+            <form id="profileForm">
+                <input type="hidden" name="userId" th:value="${session.user.userId}">
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">管理账号</label>
+                        <input type="text" name="username" class="form-control" th:value="${session.user.username}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">真实姓名</label>
+                        <input type="text" name="realName" class="form-control" th:value="${session.user.realName}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">重置密码</label>
+                    <input type="password" name="password" class="form-control" placeholder="留空则保持原密码">
+                </div>
+
+                <div class="mb-3" th:if="${session.user.role == 'student'}">
+                    <label class="form-label">所属部门</label>
+                    <input type="text" class="form-control readonly-input" th:value="${deptName}" readonly>
+                    <div class="form-text">员工部门由人力资源部统一管理</div>
+                </div>
+
+                <div class="alert alert-info py-2" th:if="${session.user.role == 'admin'}">
+                    <small>ℹ️ 管理员账号拥有全系统最高操作权限，请妥善保管密码。</small>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="button" class="btn btn-dark save-btn w-100" onclick="submitUpdate()">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script th:src="@{/js/shared-sidebar.js}"></script>
+<script>
+    function submitUpdate() {
+        if(!confirm('确定更新个人资料吗？')) return;
+        $.post('/user/updateProfile', $('#profileForm').serialize(), function(res) {
+            if (res.success) {
+                alert('资料更新成功，请重新登录！');
+                window.location.href = '/logout';
+            } else {
+                alert('操作失败：' + res.message);
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -15,7 +15,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { href: '/teacher/plan', icon: '📅', text: '下发计划' },
             { href: '/teacher/categories', icon: '📁', text: '分类管理' },
             { href: '/teacher/audit', icon: '🎓', text: '培训审核' },
-            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
+            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
+            { href: '/user/profile', icon: '👤', text: '个人中心' }
         ];
     } else if (currentRole === 'admin') {
         roleTitle = '⚙️ 管理端';
@@ -23,7 +24,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { href: '/admin/teachers', icon: '👨‍🏫', text: '教师管理' },
             { href: '/admin/students', icon: '👨‍🎓', text: '学员管理' },
             { href: '/admin/audit', icon: '📋', text: '课程审核' },
-            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
+            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
+            { href: '/user/profile', icon: '👤', text: '个人中心' }
         ];
     } else {
         roleTitle = '👨‍🎓 学员端';
@@ -31,7 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
             { href: '/student/index', icon: '🏠', text: '学员首页' },
             { href: '/student/public-courses', icon: '🌍', text: '全员公开课' },
             { href: '/student/dept-courses', icon: '🎯', text: '部门必修课' },
-            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' }
+            { href: '/student/ranking', icon: '🏆', text: '荣誉榜' },
+            { href: '/user/profile', icon: '👤', text: '个人中心' }
         ];
     }
 
