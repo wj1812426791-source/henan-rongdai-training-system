@@ -139,6 +139,10 @@ public interface CourseMapper {
             "VALUES (#{userId}, #{credit}, 1, GETDATE())")
     void saveTrainingStatus(@Param("userId") Integer userId, @Param("credit") Integer credit);
 
+    // 24-2. 更新学员审核状态为通过（更新现有记录）
+    @Update("UPDATE TrainingStatus SET status = 1, auditTime = GETDATE(), finalCredit = #{currentCredit} WHERE userId = #{userId} AND status = 0")
+    void updateStatusToPass(@Param("userId") Integer userId, @Param("currentCredit") Integer currentCredit);
+
     // 25. 获取用户累计学分
     @Select("SELECT ISNULL(SUM(c.credit), 0) FROM StudyRecords sr " +
             "JOIN Courses c ON sr.courseId = c.courseId " +

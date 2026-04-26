@@ -165,7 +165,7 @@ public class TeacherController {
     public Map<String, Object> approve(@RequestParam Integer userId, @RequestParam Integer credit) {
         Map<String, Object> result = new HashMap<>();
         try {
-            courseMapper.saveTrainingStatus(userId, credit);
+            courseMapper.updateStatusToPass(userId, credit);
             result.put("success", true);
         } catch (Exception e) {
             result.put("success", false);
